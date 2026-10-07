@@ -1,0 +1,9 @@
+export type NotificationChannel="email"|"whatsapp"|"sms"|"push";
+export interface NotificationMessage{recipient:string;title?:string;body:string;data?:Record<string,string>}
+export interface DeliveryResult{providerId?:string;status:"sent"|"queued"|"failed";cost?:number}
+export interface NotificationProvider{channel:NotificationChannel;send(message:NotificationMessage):Promise<DeliveryResult>}
+export interface CreatePaymentInput{amount:number;currency:string;reference:string;returnUrl:string;metadata?:Record<string,string>}
+export interface PaymentIntent{reference:string;checkoutUrl?:string;status:"pending"|"paid"|"failed"}
+export interface ProviderPayment{reference:string;amount:number;currency:string;status:"pending"|"paid"|"failed"|"refunded"}
+export interface VerifiedPaymentEvent{eventId:string;payment:ProviderPayment}
+export interface PaymentProvider{createPayment(input:CreatePaymentInput):Promise<PaymentIntent>;getPayment(reference:string):Promise<ProviderPayment>;verifyWebhook(request:Request):Promise<VerifiedPaymentEvent>}
