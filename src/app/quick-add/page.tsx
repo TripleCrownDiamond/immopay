@@ -1,0 +1,3 @@
+import Link from "next/link";import {AppShell} from "@/components/app-shell";
+const actions=[["Ajouter un bien","/properties/new"],["Ajouter une unité","/units/new"],["Ajouter un locataire","/tenants/new"],["Créer un contrat","/leases/new"],["Enregistrer un paiement","/payments/new"]];
+export default function QuickAdd(){return <AppShell><div className="mx-auto max-w-xl"><h1 className="text-3xl font-bold">Ajouter</h1><p className="mt-2 text-slate-500">Que voulez-vous faire ?</p><div className="mt-6 grid gap-3">{actions.map(([l,h])=><Link key={l} href={h} className="rounded-2xl bg-white p-5 font-semibold shadow-sm hover:ring-2 hover:ring-indigo-100">{l}<span className="float-right text-indigo-500">→</span></Link>)}</div></div></AppShell>}
