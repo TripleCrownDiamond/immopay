@@ -1,0 +1,3 @@
+export type ReminderRule={offsetDays:number;channels:("push"|"email"|"whatsapp"|"sms")[];template:string};
+export const defaultReminderRules:ReminderRule[]=[{offsetDays:-5,channels:["email","push"],template:"rent_due_soon"},{offsetDays:-2,channels:["whatsapp","push"],template:"rent_due_soon"},{offsetDays:0,channels:["push","whatsapp"],template:"rent_due_today"},{offsetDays:3,channels:["push","whatsapp"],template:"rent_overdue"},{offsetDays:7,channels:["sms"],template:"rent_overdue"}];
+export function reminderDate(dueOn:string,offsetDays:number){const d=new Date(dueOn+"T09:00:00Z");d.setUTCDate(d.getUTCDate()+offsetDays);return d}
