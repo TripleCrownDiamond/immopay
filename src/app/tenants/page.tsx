@@ -1,0 +1,3 @@
+import {AppShell} from "@/components/app-shell";
+const tenants=[["Aïcha S.","Appartement A3","À jour"],["Jean K.","Boutique B2","Partiel"],["Mariam A.","Appartement C1","En retard"]];
+export default function Tenants(){return <AppShell><p className="text-sm text-slate-500">Relations locatives</p><h1 className="text-3xl font-bold">Locataires</h1><div className="mt-7 overflow-hidden rounded-2xl bg-white shadow-sm">{tenants.map(([n,u,s])=><div key={n} className="flex items-center justify-between border-b p-5 last:border-0"><div><strong>{n}</strong><p className="text-sm text-slate-500">{u}</p></div><span className="text-sm">{s}</span></div>)}</div></AppShell>}
