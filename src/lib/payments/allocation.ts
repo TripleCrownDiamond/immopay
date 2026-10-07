@@ -1,0 +1,4 @@
+export type DueBalance={id:string;amountExpected:number;amountPaid:number};
+export type Allocation={rentDueId:string;amount:number};
+export function allocatePayment(amount:number,dues:DueBalance[]):Allocation[]{if(amount<=0)throw new Error("Payment amount must be positive");let remaining=amount;const allocations:Allocation[]=[];for(const due of dues){if(remaining<=0)break;const balance=Math.max(0,due.amountExpected-due.amountPaid);const applied=Math.min(balance,remaining);if(applied>0){allocations.push({rentDueId:due.id,amount:applied});remaining-=applied}}if(remaining>0)throw new Error("Payment exceeds selected outstanding balance");return allocations}
+export function dueStatus(expected:number,paid:number,dueOn:Date,now=new Date()){if(paid>=expected)return "paid";if(paid>0)return "partial";return dueOn<now?"overdue":"due"}
