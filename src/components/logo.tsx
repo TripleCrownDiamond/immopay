@@ -1,0 +1,2 @@
+import Image from "next/image";
+export function Logo({height=36,mark=false,className=""}:{height?:number;mark?:boolean;className?:string}){return mark?<Image src="/brand/immopay-mark.svg" alt="ImmoPay" width={height} height={height} unoptimized priority className={className}/>:<Image src="/brand/immopay-logo.svg" alt="ImmoPay" width={Math.round(height*430/110)} height={height} unoptimized priority className={className}/>}
