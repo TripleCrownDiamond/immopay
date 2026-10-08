@@ -90,7 +90,7 @@ export default function Landing(){return <main className="min-h-screen overflow-
         <h2 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">Gérez les biens de tous vos clients</h2>
         <p className="mt-5 max-w-xl text-lg leading-8 text-slate-300">Chaque propriétaire qui vous confie ses biens a son espace, ses locataires et ses rapports. Votre équipe encaisse, relance et reverse depuis un seul tableau de bord.</p>
         <BenefitList audience="agencies" dark/>
-        <div className="mt-8 flex flex-wrap gap-3"><Link href="/signup" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 font-semibold text-brand-ink hover:bg-brand-mist">Créer l’espace de mon agence<ArrowRight className="h-4 w-4"/></Link><a href="#pricing" className="inline-flex items-center rounded-xl border border-white/20 px-6 py-3.5 font-semibold text-white hover:bg-white/10">Voir l’offre Business</a></div>
+        <div className="mt-8 flex flex-wrap gap-3"><Link href="/signup/agence" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 font-semibold text-brand-ink hover:bg-brand-mist">Créer l’espace de mon agence<ArrowRight className="h-4 w-4"/></Link><a href="#pricing" className="inline-flex items-center rounded-xl border border-white/20 px-6 py-3.5 font-semibold text-white hover:bg-white/10">Voir l’offre Business</a></div>
       </div>
       <div className="relative aspect-[1.25/1] w-full overflow-hidden rounded-[32px] bg-gradient-to-b from-[#1B2A63] to-[#0B1A4A]">
         <AgencyDistrict3DLazy className="h-full w-full"/>
