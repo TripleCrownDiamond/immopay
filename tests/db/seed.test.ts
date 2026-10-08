@@ -4,7 +4,7 @@ import {Pool} from "pg";
 import {seedDemo} from "../../scripts/seed-demo.mjs";
 
 describe("Neon demo seed", () => {
-  it.skipIf(process.env.NEON_BRANCH !== "auth-demo-rehearsal-20261008")("is repeatable without duplicating rows", async () => {
+  it.skipIf(process.env.NEON_BRANCH !== "auth-onboarding-rehearsal-20261008")("is repeatable and preserves organization kinds", async () => {
     const pool = new Pool({connectionString: process.env.DATABASE_URL_UNPOOLED});
     try {
       await seedDemo(pool);
@@ -12,6 +12,8 @@ describe("Neon demo seed", () => {
       await seedDemo(pool);
       const second = await pool.query("select (select count(*) from organizations where is_demo) as orgs, (select count(*) from receipts) as receipts");
       expect(second.rows).toEqual(first.rows);
+      const kinds = await pool.query("SELECT name,kind FROM organizations WHERE is_demo ORDER BY name");
+      expect(kinds.rows).toEqual([{name:"Agence Démo",kind:"agency"},{name:"Résidence Démo",kind:"owner"}]);
     } finally {
       await pool.end();
     }

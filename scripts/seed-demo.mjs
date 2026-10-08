@@ -29,8 +29,8 @@ export async function seedDemo(pool) {
     if (existing.rows.some(row => !row.is_demo)) throw new Error("A demo organization ID belongs to real data");
 
     const rows = [
-      ["organizations", ["id", "name", "currency", "is_demo"], [demoIds.ownerOrg, "Résidence Démo", "XOF", true]],
-      ["organizations", ["id", "name", "currency", "is_demo"], [demoIds.agencyOrg, "Agence Démo", "XOF", true]],
+      ["organizations", ["id", "name", "currency", "is_demo", "kind"], [demoIds.ownerOrg, "Résidence Démo", "XOF", true, "owner"]],
+      ["organizations", ["id", "name", "currency", "is_demo", "kind"], [demoIds.agencyOrg, "Agence Démo", "XOF", true, "agency"]],
       ["properties", ["id", "organization_id", "name", "type", "address"], ["20000000-0000-4000-8000-000000000001", demoIds.ownerOrg, "Résidence Les Cocotiers", "immeuble", "Cotonou, Fidjrossè"]],
       ["properties", ["id", "organization_id", "name", "type", "address"], ["20000000-0000-4000-8000-000000000002", demoIds.agencyOrg, "Boutiques Cadjèhoun", "commerce", "Cotonou, Cadjèhoun"]],
       ["properties", ["id", "organization_id", "name", "type", "address"], ["20000000-0000-4000-8000-000000000003", demoIds.agencyOrg, "Studios Calavi", "immeuble", "Abomey-Calavi"]],

@@ -71,6 +71,7 @@ test("password recovery does not reveal an unknown account",async({page})=>{
   await page.getByLabel("Email du compte").fill(`unknown-${Date.now()}@immopay.test`);
   await page.getByRole("button",{name:"Recevoir un lien"}).click();
   await expect(page.getByRole("status")).toHaveText("Si un compte existe pour cette adresse, un lien de réinitialisation a été envoyé.",{timeout:20_000});
-  await page.goto("/reinitialiser-mot-de-passe");
+  const resetPage=await page.goto("/reinitialiser-mot-de-passe");
+  expect(resetPage?.headers()["referrer-policy"]).toBe("no-referrer");
   await expect(page.locator("main p[role=alert]")).toHaveText("Ce lien est invalide ou expiré.");
 });

@@ -52,6 +52,19 @@ describe("invitation acceptance", () => {
       await expect(acceptInvitation({id:`revoked-${suffix}`,email:`revoked-${suffix}@example.test`,name:"Revoked"},revoked.urlToken,db)).rejects.toMatchObject({code:"REVOKED"});
       const conflict = await issueInvitation(manager,{kind:"agency_manager",organizationId:agencyOrg,email:ownerEmail},db);
       await expect(acceptInvitation({id:owner,email:ownerEmail,name:"Owner"},conflict.urlToken,db)).rejects.toMatchObject({code:"ROLE_CONFLICT"});
+      const otherManager = (await db.query(`SELECT p.auth_user_id,p.email,p.full_name FROM profiles p
+        JOIN organization_members m ON m.auth_user_id=p.auth_user_id
+        JOIN organizations o ON o.id=m.organization_id
+        WHERE o.is_demo AND m.role='agency_manager' LIMIT 1`)).rows[0];
+      const foreignManagerInvite = await issueInvitation(manager,{kind:"agency_manager",organizationId:agencyOrg,email:otherManager.email},db);
+      await expect(acceptInvitation({id:otherManager.auth_user_id,email:otherManager.email,name:otherManager.full_name},foreignManagerInvite.urlToken,db)).rejects.toMatchObject({code:"ROLE_CONFLICT"});
+      const existingTenant=(await db.query(`SELECT p.auth_user_id,p.email,p.full_name FROM profiles p
+        WHERE p.kind='tenant' AND p.email='locataire.demo@immopay.test' LIMIT 1`)).rows[0];
+      const secondTenant=(await db.query("INSERT INTO tenants(organization_id,full_name,email) VALUES($1,$2,$3) RETURNING id",[ownerOrg,existingTenant.full_name,existingTenant.email])).rows[0].id;
+      await db.query("INSERT INTO leases(organization_id,unit_id,tenant_id,rent_amount,starts_on) VALUES($1,$2,$3,60000,CURRENT_DATE)",[ownerOrg,unit,secondTenant]);
+      const secondTenantInvite=await issueInvitation(owner,{kind:"tenant",organizationId:ownerOrg,tenantId:secondTenant},db);
+      expect((await acceptInvitation({id:existingTenant.auth_user_id,email:existingTenant.email,name:existingTenant.full_name},secondTenantInvite.urlToken,db)).destination).toBe("/espace-locataire");
+      expect((await getTenantRentals(existingTenant.auth_user_id,db)).some(r=>r.unit==="A1")).toBe(true);
     } finally {
       if (ownerOrg || agencyOrg) await db.query("DELETE FROM organizations WHERE id=ANY($1::uuid[])", [[ownerOrg,agencyOrg].filter(Boolean)]).catch(() => {});
       await db.query("DELETE FROM profiles WHERE auth_user_id=ANY($1::text[])", [[owner,manager,tenantAuth,newManager]]).catch(() => {});
