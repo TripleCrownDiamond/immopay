@@ -36,7 +36,7 @@ export async function listProperties(userId: string, organizationId?: string, db
 
 export async function listTenants(userId: string, organizationId?: string, db: Queryable = getPool()) {
   const membership = await requireOrganization(userId, organizationId, db);
-  const result = await db.query(`SELECT t.id, t.full_name AS name, t.email, u.name AS unit,
+  const result = await db.query(`SELECT t.id, t.full_name AS name, t.email, t.auth_user_id AS "authUserId", u.name AS unit,
     COALESCE(d.status,'none') AS status
     FROM tenants t
     LEFT JOIN LATERAL (SELECT l.id,l.unit_id FROM leases l
@@ -44,7 +44,7 @@ export async function listTenants(userId: string, organizationId?: string, db: Q
     LEFT JOIN units u ON u.id=l.unit_id AND u.organization_id=t.organization_id
     LEFT JOIN LATERAL (SELECT status FROM rent_dues d WHERE d.lease_id=l.id ORDER BY d.due_on DESC LIMIT 1) d ON true
     WHERE t.organization_id=$1 ORDER BY t.full_name`, [membership.organizationId]);
-  return {membership, rows: result.rows as {id: string; name: string; email: string | null; unit: string | null; status: string}[]};
+  return {membership, rows: result.rows as {id: string; name: string; email: string | null; authUserId: string | null; unit: string | null; status: string}[]};
 }
 
 export async function listDues(userId: string, organizationId?: string, db: Queryable = getPool()) {

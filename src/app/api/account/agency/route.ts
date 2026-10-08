@@ -4,7 +4,7 @@ import {createAgency} from "@/lib/onboarding/agency";
 
 export async function POST(request: Request) {
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) return Response.json({error: "BAD_ORIGIN"}, {status: 403});
+  if (origin !== new URL(request.url).origin) return Response.json({error: "BAD_ORIGIN"}, {status: 403});
   const {data} = await auth.getSession();
   const user = data?.user;
   if (!user?.id || !user.email) return Response.json({error: "UNAUTHENTICATED"}, {status: 401});
