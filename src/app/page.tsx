@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import {ArrowRight,Bell,Building2,ChartColumn,ChevronDown,CircleCheck,CreditCard,Crown,FileCheck2,FileText,Play,TrendingUp,UserRoundSearch} from "lucide-react";
 import {QrMark,Sparkline} from "@/components/landing/illustrations";
 import {AgencyDistrict3DLazy,City3DLazy,HeroDevices3DLazy,TenantPhones3DLazy} from "@/components/landing/lazy-3d";
@@ -68,15 +67,12 @@ export default function Landing(){return <main className="min-h-screen overflow-
 
   {/* Owners */}
   <section id="avantages" className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-24 lg:grid-cols-2 lg:px-8">
-    <div>
-      <div className="relative">
-        <div className="h-[380px] overflow-hidden rounded-[32px] bg-gradient-to-b from-[#CFE0FF] via-[#E8F0FF] to-[#E3FAF0] sm:h-[460px]"><City3DLazy className="h-full w-full"/></div>
-        <div className="anim-float absolute -bottom-8 left-4 w-[260px] rounded-2xl border border-brand-line bg-white p-4 shadow-2xl shadow-blue-100 sm:left-8">
-          <div className="flex items-center gap-3"><Tile icon={ChartColumn}/><div><span className="text-xs text-slate-500">Revenus du mois</span><b className="block text-lg">1 420 000 F</b></div><span className="ml-auto flex items-center gap-0.5 text-xs font-bold text-emerald-600"><TrendingUp className="h-3.5 w-3.5"/>12%</span></div>
-          <Sparkline className="mt-3 h-14 w-full"/>
-        </div>
+    <div className="relative">
+      <div className="h-[380px] overflow-hidden rounded-[32px] bg-gradient-to-b from-[#CFE0FF] via-[#E8F0FF] to-[#E3FAF0] sm:h-[460px]"><City3DLazy className="h-full w-full"/></div>
+      <div className="anim-float absolute -bottom-8 left-4 w-[260px] rounded-2xl border border-brand-line bg-white p-4 shadow-2xl shadow-blue-100 sm:left-8">
+        <div className="flex items-center gap-3"><Tile icon={ChartColumn}/><div><span className="text-xs text-slate-500">Revenus du mois</span><b className="block text-lg">1 420 000 F</b></div><span className="ml-auto flex items-center gap-0.5 text-xs font-bold text-emerald-600"><TrendingUp className="h-3.5 w-3.5"/>12%</span></div>
+        <Sparkline className="mt-3 h-14 w-full"/>
       </div>
-      <div className="relative mt-14 h-[210px] overflow-hidden rounded-[28px] sm:h-[240px]"><Image src="/images/owner-residence.jpg" alt="Résidence locative aux tons terre cuite, bordée de palmiers" fill sizes="(min-width: 1024px) 45vw, 100vw" className="object-cover"/></div>
     </div>
     <div>
       <p className="text-sm font-bold text-brand-blue">Pour les propriétaires</p>
