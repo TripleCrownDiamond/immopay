@@ -76,6 +76,7 @@ export function LoginForm({tenant=false}: {tenant?: boolean}) {
   return <form className="mt-8 space-y-4" onSubmit={submit}>
     <label className="block text-sm font-medium">Email<input name="email" type="email" autoComplete="email" required placeholder="vous@exemple.com" className="mt-2 w-full rounded-xl border p-3.5"/></label>
     <label className="block text-sm font-medium">Mot de passe<input name="password" type="password" autoComplete="current-password" required className="mt-2 w-full rounded-xl border p-3.5"/></label>
+    <Link href="/mot-de-passe-oublie" className="block text-right text-sm font-semibold text-brand-blue">Mot de passe oublié ?</Link>
     {error && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
     {profileMissing && !tenant && <Link href="/signup/agence" className="block text-sm font-semibold text-brand-blue">Terminer l’inscription de mon agence</Link>}
     <button disabled={pending} className="w-full rounded-xl bg-indigo-600 p-3.5 font-semibold text-white disabled:opacity-60">{pending ? "Connexion…" : "Se connecter"}</button>

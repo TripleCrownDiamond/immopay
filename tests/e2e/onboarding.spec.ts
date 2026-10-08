@@ -65,3 +65,12 @@ test("a new tenant activates an invited account and sees an empty private space"
     await expect(tenantPage.getByText("Aucune location enregistrée.")).toBeVisible();
   } finally {await tenantContext.close();}
 });
+
+test("password recovery does not reveal an unknown account",async({page})=>{
+  await page.goto("/mot-de-passe-oublie");
+  await page.getByLabel("Email du compte").fill(`unknown-${Date.now()}@immopay.test`);
+  await page.getByRole("button",{name:"Recevoir un lien"}).click();
+  await expect(page.getByRole("status")).toHaveText("Si un compte existe pour cette adresse, un lien de réinitialisation a été envoyé.",{timeout:20_000});
+  await page.goto("/reinitialiser-mot-de-passe");
+  await expect(page.locator("main p[role=alert]")).toHaveText("Ce lien est invalide ou expiré.");
+});
