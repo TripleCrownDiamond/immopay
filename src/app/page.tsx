@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {ArrowRight,Bell,Building2,ChartColumn,ChevronDown,CircleCheck,CreditCard,Crown,FileCheck2,FileText,Play,TrendingUp,UserRoundSearch} from "lucide-react";
 import {QrMark,Sparkline} from "@/components/landing/illustrations";
 import {AgencyDistrict3DLazy,City3DLazy,HeroDevices3DLazy,TenantPhones3DLazy} from "@/components/landing/lazy-3d";
@@ -42,7 +43,7 @@ export default function Landing(){return <main className="min-h-screen overflow-
     <div className="relative mx-auto grid max-w-7xl min-w-0 items-center gap-10 px-5 pb-20 pt-10 lg:px-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] xl:gap-8 xl:pb-28 xl:pt-16">
       <div className="anim-rise min-w-0">
         <span className="inline-flex items-center gap-2 rounded-full border border-brand-line bg-white px-3 py-1.5 text-xs font-semibold text-slate-600"><span className="h-2 w-2 rounded-full bg-brand-green anim-ping"/>Gestion locative simplifiée</span>
-        <h1 className="mt-6 text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl xl:text-[clamp(3rem,4.2vw,3.75rem)]">Vos loyers.<br/><span className="text-brand-blue">Automatiquement.</span></h1>
+        <h1 className="mt-6 text-[clamp(1.875rem,9.5vw,3rem)] font-extrabold leading-[1.02] tracking-tight sm:text-6xl xl:text-[clamp(3rem,4.2vw,3.75rem)]">Vos loyers.<br/><span className="text-brand-blue">Automatiquement.</span></h1>
         <p className="mt-6 max-w-lg text-lg leading-8 text-slate-600">Pour les propriétaires et les agences immobilières : rappels automatiques, paiements en ligne ou en banque, et quittances vérifiables générées sans effort.</p>
         <div className="mt-8 flex flex-wrap gap-3"><Link href="/signup" className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-6 py-3.5 font-semibold text-white shadow-xl shadow-blue-200 hover:bg-brand-deep">Commencer gratuitement<ArrowRight className="h-4 w-4"/></Link><Link href="/dashboard" className="inline-flex items-center gap-2 rounded-xl border border-brand-line bg-white px-6 py-3.5 font-semibold"><Play className="h-4 w-4 fill-brand-ink"/>Voir la démo</Link></div>
         <div className="mt-8 flex flex-wrap gap-5 text-sm font-medium text-slate-600">{["Simple à utiliser","Sécurisé","Adapté à l’Afrique"].map(x=><span key={x} className="flex items-center gap-1.5"><CircleCheck className="h-5 w-5 text-brand-green"/>{x}</span>)}</div>
@@ -67,12 +68,15 @@ export default function Landing(){return <main className="min-h-screen overflow-
 
   {/* Owners */}
   <section id="avantages" className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-24 lg:grid-cols-2 lg:px-8">
-    <div className="relative">
-      <div className="h-[380px] overflow-hidden rounded-[32px] bg-gradient-to-b from-[#CFE0FF] via-[#E8F0FF] to-[#E3FAF0] sm:h-[460px]"><City3DLazy className="h-full w-full"/></div>
-      <div className="anim-float absolute -bottom-8 left-4 w-[260px] rounded-2xl border border-brand-line bg-white p-4 shadow-2xl shadow-blue-100 sm:left-8">
-        <div className="flex items-center gap-3"><Tile icon={ChartColumn}/><div><span className="text-xs text-slate-500">Revenus du mois</span><b className="block text-lg">1 420 000 F</b></div><span className="ml-auto flex items-center gap-0.5 text-xs font-bold text-emerald-600"><TrendingUp className="h-3.5 w-3.5"/>12%</span></div>
-        <Sparkline className="mt-3 h-14 w-full"/>
+    <div>
+      <div className="relative">
+        <div className="h-[380px] overflow-hidden rounded-[32px] bg-gradient-to-b from-[#CFE0FF] via-[#E8F0FF] to-[#E3FAF0] sm:h-[460px]"><City3DLazy className="h-full w-full"/></div>
+        <div className="anim-float absolute -bottom-8 left-4 w-[260px] rounded-2xl border border-brand-line bg-white p-4 shadow-2xl shadow-blue-100 sm:left-8">
+          <div className="flex items-center gap-3"><Tile icon={ChartColumn}/><div><span className="text-xs text-slate-500">Revenus du mois</span><b className="block text-lg">1 420 000 F</b></div><span className="ml-auto flex items-center gap-0.5 text-xs font-bold text-emerald-600"><TrendingUp className="h-3.5 w-3.5"/>12%</span></div>
+          <Sparkline className="mt-3 h-14 w-full"/>
+        </div>
       </div>
+      <div className="relative mt-14 h-[210px] overflow-hidden rounded-[28px] sm:h-[240px]"><Image src="/images/owner-residence.jpg" alt="Résidence locative aux tons terre cuite, bordée de palmiers" fill sizes="(min-width: 1024px) 45vw, 100vw" className="object-cover"/></div>
     </div>
     <div>
       <p className="text-sm font-bold text-brand-blue">Pour les propriétaires</p>

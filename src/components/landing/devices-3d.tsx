@@ -1,21 +1,10 @@
 "use client";
-import {createContext,useContext,useEffect,useMemo,useRef,useState,type ReactNode,type RefObject} from "react";
+import {useEffect,useMemo,useRef,useState,type ReactNode} from "react";
 import {Canvas,useFrame,type ThreeElements} from "@react-three/fiber";
-import {ContactShadows,Environment,Float,Html,Lightformer,RoundedBox,useTexture} from "@react-three/drei";
+import {ContactShadows,Environment,Lightformer,RoundedBox,useTexture} from "@react-three/drei";
 import * as THREE from "three";
 import {FitCamera} from "./fit-camera";
 import {CircleCheck,MessageCircle,type LucideIcon} from "lucide-react";
-
-// Stable DOM target for screen HTML. Without it, drei re-creates the HTML root once the canvas
-// mounts, and one of several screens can end up empty.
-const PortalCtx=createContext<RefObject<HTMLDivElement|null>|null>(null);
-
-function roundedRect(w:number,h:number,r:number){
-  const s=new THREE.Shape(),x=-w/2,y=-h/2;
-  s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-  s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);
-  return new THREE.ShapeGeometry(s,10);
-}
 
 function phoneBezel(w:number,h:number,innerW:number,innerH:number){
   const outer=new THREE.Shape(),r=.32,x=-w/2,y=-h/2;
@@ -26,20 +15,6 @@ function phoneBezel(w:number,h:number,innerW:number,innerH:number){
   hole.lineTo(ix+innerW-ir,iy+innerH);hole.quadraticCurveTo(ix+innerW,iy+innerH,ix+innerW,iy+innerH-ir);hole.lineTo(ix+innerW,iy+ir);hole.quadraticCurveTo(ix+innerW,iy,ix+innerW-ir,iy);
   outer.holes.push(hole);
   return new THREE.ShapeGeometry(outer,12);
-}
-
-/**
- * The live dashboard on the laptop. Phone screens use textures so their pixels share the
- * same perspective, depth, and rounded viewport as the physical 3D phone.
- */
-function Screen({w,h,px,radius,src}:{w:number;h:number;px:number;radius:number;src:string}){
-  const geo=useMemo(()=>roundedRect(w,h,radius),[w,h,radius]);
-  const pxH=Math.round(px*h/w), pxR=Math.round(px*radius/w), portal=useContext(PortalCtx);
-  return <Html transform occlude="blending" portal={(portal??undefined) as RefObject<HTMLElement>|undefined} distanceFactor={400*w/px} geometry={<primitive object={geo}/>}>
-    <div style={{width:px,height:pxH,borderRadius:pxR,overflow:"hidden",clipPath:`inset(0 round ${pxR}px)`,backfaceVisibility:"hidden",background:"#F6F7FA"}} aria-hidden="true">
-      <iframe src={src} title="" tabIndex={-1} loading="lazy" scrolling="no" style={{width:px,height:pxH,border:0,pointerEvents:"none",display:"block"}}/>
-    </div>
-  </Html>;
 }
 
 const BODY=<meshPhysicalMaterial color="#1A2145" metalness={.75} roughness={.28} clearcoat={1} clearcoatRoughness={.15}/>;
@@ -62,8 +37,10 @@ function Phone3D({screen,...props}:{screen:string}&ThreeElements["group"]){
   </group>;
 }
 
-function Laptop3D({src,...props}:{src:string}&ThreeElements["group"]){
+function Laptop3D(props:ThreeElements["group"]){
   const W=7.2,D=4.8;
+  const dashboard=useTexture("/demo-screens/dashboard-hero.png");
+  dashboard.colorSpace=THREE.SRGBColorSpace;
   return <group {...props}>
     <RoundedBox args={[W,.2,D]} radius={.09} smoothness={4} position={[0,.1,0]} castShadow receiveShadow><meshStandardMaterial {...ALU}/></RoundedBox>
     <mesh position={[0,.205,-.45]}><boxGeometry args={[W*.86,.01,2.3]}/><meshStandardMaterial color="#B9C1D2" roughness={.6}/></mesh>
@@ -72,7 +49,7 @@ function Laptop3D({src,...props}:{src:string}&ThreeElements["group"]){
     <group position={[0,.2,-D/2+.05]} rotation={[-.26,0,0]}>
       <RoundedBox args={[W,4.6,.13]} radius={.09} smoothness={4} position={[0,2.3,0]} castShadow><meshStandardMaterial {...ALU}/></RoundedBox>
       <mesh position={[0,2.3,.067]}><planeGeometry args={[W-.16,4.44]}/><meshStandardMaterial color="#070B1D" roughness={.3}/></mesh>
-      <group position={[0,2.36,.072]}><Screen w={6.7} h={4.19} px={1024} radius={.06} src={src}/></group>
+      <mesh position={[0,2.3,.072]}><planeGeometry args={[6.7,4.19]}/><meshBasicMaterial map={dashboard} toneMapped={false}/></mesh>
     </group>
   </group>;
 }
@@ -103,9 +80,9 @@ function Stage({className,camera,children,overlay}:{className:string;camera:{pos
   const still=typeof window!=="undefined"&&matchMedia("(prefers-reduced-motion: reduce)").matches;
   useEffect(()=>{const io=new IntersectionObserver(([e])=>setVisible(e.isIntersecting));if(box.current)io.observe(box.current);return()=>io.disconnect();},[]);
   return <div ref={box} className={`relative isolate overflow-hidden ${className}`}>
-    <PortalCtx.Provider value={box}><Canvas shadows dpr={[1,2]} frameloop={!visible?"never":still?"demand":"always"} camera={camera} gl={{antialias:true,alpha:true}}>
+    <Canvas shadows dpr={[1,2]} frameloop={!visible?"never":still?"demand":"always"} camera={camera} gl={{antialias:true,alpha:true}}>
       <Lights/>{children}
-    </Canvas></PortalCtx.Provider>
+    </Canvas>
     {overlay}
   </div>;
 }
@@ -130,7 +107,7 @@ export function HeroDevices3D({className=""}:{className?:string}){
   </>}>
     <Parallax amount={.025}>
       <group ref={hero}>
-        <Laptop3D src="/dashboard" position={[-1.6,0,-.6]} rotation={[0,.3,0]}/>
+        <Laptop3D position={[-1.6,0,-.6]} rotation={[0,.3,0]}/>
         <Phone3D position={[2.75,2.5,2]} rotation={[-.05,-.32,.03]} screen="/demo-screens/tenant-home.png"/>
       </group><FitCamera target={hero} dir={[-.03,.24,1]} margin={.86}/>
       <ContactShadows position={[0,-.01,0]} opacity={.35} scale={18} blur={2.4} far={5} color="#0B3FD6"/>
