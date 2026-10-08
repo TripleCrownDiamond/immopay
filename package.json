@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:seed": "node scripts/seed-demo.mjs",
+    "db:provision": "node scripts/provision-demo.mjs"
   },
   "dependencies": {
     "@neon/config": "^1.8.4",
