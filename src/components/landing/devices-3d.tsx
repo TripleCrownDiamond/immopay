@@ -41,6 +41,11 @@ function Laptop3D(props:ThreeElements["group"]){
   const W=7.2,D=4.8;
   const dashboard=useTexture("/demo-screens/dashboard-hero.png");
   dashboard.colorSpace=THREE.SRGBColorSpace;
+  // The original dashboard screenshot includes a wide white navigation rail.
+  // Show its content area on the small laptop display so the left edge is filled.
+  const crop=925/1200;
+  dashboard.repeat.set(crop,crop);
+  dashboard.offset.set(1-crop,1-crop);
   return <group {...props}>
     <RoundedBox args={[W,.2,D]} radius={.09} smoothness={4} position={[0,.1,0]} castShadow receiveShadow><meshStandardMaterial {...ALU}/></RoundedBox>
     <mesh position={[0,.205,-.45]}><boxGeometry args={[W*.86,.01,2.3]}/><meshStandardMaterial color="#B9C1D2" roughness={.6}/></mesh>
