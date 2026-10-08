@@ -3,7 +3,7 @@
 ## Stack
 - Next.js (App Router) + TypeScript
 - Tailwind CSS
-- Supabase : PostgreSQL, Auth, Storage, RLS
+- Neon : projet PostgreSQL lié ; Auth et modèle métier à intégrer
 - PWA / Web Push
 - API/Route Handlers pour webhooks et intégrations
 
@@ -13,7 +13,9 @@
 ## Tables principales
 profiles, organizations, organization_members, properties, units, tenants, leases, lease_charges, rent_dues, payments, payment_allocations, receipts, notification_preferences, notification_jobs, notification_deliveries, push_subscriptions, plans, subscriptions, usage_counters, audit_logs.
 
-Toutes les entités métier portent organization_id lorsque pertinent. Les politiques RLS doivent empêcher tout accès inter-organisation.
+Ces tables décrivent le modèle cible. Les migrations SQL présentes sous `supabase/` sont historiques et ne sont pas appliquées à Neon. La séparation par organisation et les contrôles d'accès restent à implémenter et à vérifier côté serveur avant l'usage de données réelles.
+
+Pour les extensions foncières envisagées après le MVP, conserver un socle commun « actif, partie, accord, échéance, paiement, document » et modéliser séparément les baux agricoles, baux commerciaux et ventes. Une vente ne doit pas être forcée dans le modèle `leases`. Aucun schéma ni parcours de ces extensions n'est déployé à ce stade.
 
 ## Providers
 ```ts

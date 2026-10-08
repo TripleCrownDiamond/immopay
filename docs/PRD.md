@@ -76,12 +76,21 @@ Encaissements par période/bien/unité, impayés, occupation, historique locatai
 Manifest, icônes, mode standalone, écran d'installation, service worker, cache de shell, stratégie offline limitée, Web Push, badges lorsque supportés et deep links vers l'échéance/paiement concerné.
 
 ## 12. Sécurité
-Supabase Auth, Row Level Security, séparation stricte par organisation/bailleur, rôles, journal d'audit, validation serveur, secrets uniquement côté serveur, vérification cryptographique des webhooks, limitation de débit sur endpoints publics, minimisation des données sur les URLs de vérification.
+Authentification à connecter à Neon, séparation stricte par organisation/bailleur, rôles vérifiés côté serveur, journal d'audit, validation serveur, secrets uniquement côté serveur, vérification cryptographique des webhooks, limitation de débit sur endpoints publics, minimisation des données sur les URLs de vérification. Les écrans actuels de démonstration ne constituent pas encore des comptes sécurisés ni des données persistées.
 
 ## 13. MVP
 Inclus : auth/onboarding, biens/unités, locataires, contrats, génération d'échéances, dashboard, paiements manuels + abstraction paiement en ligne, partiels, quittances QR, espace locataire, centre de notifications, email + push, moteur de relance extensible WhatsApp/SMS, rapports de base, abonnement/quota de base et PWA.
 
 Après MVP : équipes avancées, maintenance/incidents, comptabilité, scoring locatif sous cadre légal/consentement, marketplace et automatisations avancées.
+
+### Extensions possibles après le MVP — foncier et locaux commerciaux
+Ces usages sont **à étudier et non implémentés**. Ils réutilisent le suivi des contrats, des échéances et des paiements, avec des règles propres à chaque type d'opération.
+
+- **Location de terres agricoles** : décrire la parcelle (surface, localisation et références disponibles), le bailleur et l'exploitant, la période ou saison, le loyer et sa fréquence ; suivre acomptes, échéances saisonnières, reçus et renouvellements. Les loyers liés à une récolte demanderaient une règle de calcul explicite et vérifiable.
+- **Achat de parcelles** : suivre une transaction distincte d'un bail, avec parties, prix, réservation éventuelle, acomptes, échéancier, pièces et historique des versements. Un reçu de paiement ne doit pas être présenté comme une preuve de propriété ; les actes et vérifications de titre relèvent des intervenants compétents selon le pays.
+- **Location de magasins et autres locaux commerciaux** : étendre les biens et contrats existants aux dépôts, charges, révisions de loyer, renouvellements et, si utile, à plusieurs lots dans un même marché ou bâtiment.
+
+L'étude préalable devra confirmer les pays visés, les documents exigés, les modes de paiement et les règles propres aux baux ou ventes avant de définir ces parcours.
 
 ## 14. Critères de succès
 Temps jusqu'au premier bien < 5 min ; dashboard compréhensible immédiatement ; rapprochement automatique fiable ; quittance générée après solde complet ; aucune fuite inter-bailleur ; notifications idempotentes ; PWA installable sur navigateurs compatibles.

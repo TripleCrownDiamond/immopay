@@ -3,7 +3,7 @@
 ## Phase 1 — Foundation
 - [x] PRD and architecture
 - [x] Next.js/PWA scaffold
-- [x] Supabase initial schema + RLS foundation
+- [x] Schéma initial exploratoire (migrations Supabase historiques, non appliquées à Neon)
 - [x] Responsive app shell and landlord dashboard
 - [x] Provider abstractions
 
@@ -13,7 +13,7 @@
 - [x] Lease creation UI
 - [x] Rent schedule generator
 - [x] Partial payment allocation/domain status
-- [ ] Wire forms to Supabase
+- [ ] Migrer le modèle métier vers Neon et connecter les formulaires
 - [ ] Auth/session middleware
 - [ ] Tenant invitations
 
@@ -39,3 +39,9 @@
 - [ ] Reports/exports
 - [ ] Admin/support
 - [ ] Tests, CI and production hardening
+
+## Après le MVP — foncier et commerces (à étudier)
+- [ ] Cadrer les pays, types de contrats et justificatifs avec les utilisateurs concernés
+- [ ] Location de terres agricoles : parcelles, périodes/saisons, loyers, échéances et reçus
+- [ ] Achat de parcelles : dossier de vente, acomptes, échéancier et documents, séparés des baux
+- [ ] Étendre la location commerciale : magasins, lots, charges, dépôts et renouvellements

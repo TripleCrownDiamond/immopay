@@ -1,7 +1,7 @@
 "use client";
 import {createContext,useContext,useEffect,useMemo,useRef,useState,type ReactNode,type RefObject} from "react";
 import {Canvas,useFrame,type ThreeElements} from "@react-three/fiber";
-import {ContactShadows,Environment,Float,Html,Lightformer,RoundedBox} from "@react-three/drei";
+import {ContactShadows,Environment,Float,Html,Lightformer,RoundedBox,useTexture} from "@react-three/drei";
 import * as THREE from "three";
 import {FitCamera} from "./fit-camera";
 import {CircleCheck,MessageCircle,type LucideIcon} from "lucide-react";
@@ -17,37 +17,46 @@ function roundedRect(w:number,h:number,r:number){
   return new THREE.ShapeGeometry(s,10);
 }
 
+function phoneBezel(w:number,h:number,innerW:number,innerH:number){
+  const outer=new THREE.Shape(),r=.32,x=-w/2,y=-h/2;
+  outer.moveTo(x+r,y);outer.lineTo(x+w-r,y);outer.quadraticCurveTo(x+w,y,x+w,y+r);outer.lineTo(x+w,y+h-r);outer.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  outer.lineTo(x+r,y+h);outer.quadraticCurveTo(x,y+h,x,y+h-r);outer.lineTo(x,y+r);outer.quadraticCurveTo(x,y,x+r,y);
+  const hole=new THREE.Path(),ir=.26,ix=-innerW/2,iy=-innerH/2;
+  hole.moveTo(ix+ir,iy);hole.quadraticCurveTo(ix,iy,ix,iy+ir);hole.lineTo(ix,iy+innerH-ir);hole.quadraticCurveTo(ix,iy+innerH,ix+ir,iy+innerH);
+  hole.lineTo(ix+innerW-ir,iy+innerH);hole.quadraticCurveTo(ix+innerW,iy+innerH,ix+innerW,iy+innerH-ir);hole.lineTo(ix+innerW,iy+ir);hole.quadraticCurveTo(ix+innerW,iy,ix+innerW-ir,iy);
+  outer.holes.push(hole);
+  return new THREE.ShapeGeometry(outer,12);
+}
+
 /**
- * A real page of the app, rendered at the device's viewport size (so the app's own
- * responsive layout applies) and shown on the device screen. The HTML sits behind the canvas and a rounded
- * plane "punches" a transparent hole in it, so 3D objects in front still hide the screen.
+ * The live dashboard on the laptop. Phone screens use textures so their pixels share the
+ * same perspective, depth, and rounded viewport as the physical 3D phone.
  */
-function Screen({w,h,px,radius,src,statusBar=false}:{w:number;h:number;px:number;radius:number;src:string;statusBar?:boolean}){
+function Screen({w,h,px,radius,src}:{w:number;h:number;px:number;radius:number;src:string}){
   const geo=useMemo(()=>roundedRect(w,h,radius),[w,h,radius]);
   const pxH=Math.round(px*h/w), pxR=Math.round(px*radius/w), portal=useContext(PortalCtx);
-  return <Html transform occlude="blending" portal={(portal??undefined) as RefObject<HTMLElement>|undefined} distanceFactor={400*w/px} geometry={<primitive object={geo}/>}
-    material={<meshBasicMaterial transparent opacity={0} blending={THREE.NoBlending} side={THREE.DoubleSide}/>}>
-    <div style={{width:px,height:pxH,borderRadius:pxR,overflow:"hidden",background:"#F6F7FA"}} aria-hidden="true">
-      {statusBar&&<div style={{height:STATUS_H}} className="flex items-center justify-between bg-white px-8 pt-1 text-[15px] font-semibold text-brand-ink">
-        <span>9:41</span><span className="flex items-center gap-1.5"><span className="h-2.5 w-5 rounded-sm bg-brand-ink/80"/><span className="h-3 w-6 rounded-[4px] border-2 border-brand-ink/80 p-[1px]"><span className="block h-full w-3/4 rounded-[1px] bg-brand-ink/80"/></span></span>
-      </div>}
-      <iframe src={src} title="" tabIndex={-1} loading="lazy" scrolling="no" style={{width:px,height:pxH-(statusBar?STATUS_H:0),border:0,pointerEvents:"none",display:"block"}}/>
+  return <Html transform occlude="blending" portal={(portal??undefined) as RefObject<HTMLElement>|undefined} distanceFactor={400*w/px} geometry={<primitive object={geo}/>}>
+    <div style={{width:px,height:pxH,borderRadius:pxR,overflow:"hidden",clipPath:`inset(0 round ${pxR}px)`,backfaceVisibility:"hidden",background:"#F6F7FA"}} aria-hidden="true">
+      <iframe src={src} title="" tabIndex={-1} loading="lazy" scrolling="no" style={{width:px,height:pxH,border:0,pointerEvents:"none",display:"block"}}/>
     </div>
   </Html>;
 }
 
-const STATUS_H=46;
 const BODY=<meshPhysicalMaterial color="#1A2145" metalness={.75} roughness={.28} clearcoat={1} clearcoatRoughness={.15}/>;
 const ALU={color:"#DCE2EE",metalness:.55,roughness:.32} as const;
 
-function Phone3D({src,...props}:{src:string}&ThreeElements["group"]){
+function Phone3D({screen,...props}:{screen:string}&ThreeElements["group"]){
   const W=2.3,H=4.85,D=.26;
+  const bezel=useMemo(()=>phoneBezel(W,H,2.12,4.66),[]);
+  const texture=useTexture(screen);
+  texture.colorSpace=THREE.SRGBColorSpace;
   return <group {...props}>
     <RoundedBox args={[W,H,D]} radius={.32} smoothness={6} castShadow>{BODY}</RoundedBox>
     {/* side buttons */}
     <mesh position={[W/2+.012,.9,0]}><boxGeometry args={[.03,.55,.1]}/><meshStandardMaterial color="#2A3360" metalness={.8} roughness={.3}/></mesh>
     <mesh position={[-W/2-.012,1.1,0]}><boxGeometry args={[.03,.35,.1]}/><meshStandardMaterial color="#2A3360" metalness={.8} roughness={.3}/></mesh>
-    <group position={[0,0,D/2+.004]}><Screen w={2.12} h={4.66} px={390} radius={.26} src={src} statusBar/></group>
+    <mesh position={[0,0,D/2+.004]}><planeGeometry args={[2.12,4.66]}/><meshBasicMaterial map={texture} toneMapped={false}/></mesh>
+    <mesh position={[0,0,D/2+.012]} geometry={bezel}><meshBasicMaterial color="#1A2145" side={THREE.DoubleSide}/></mesh>
     {/* dynamic island */}
     <RoundedBox args={[.62,.18,.02]} radius={.08} smoothness={4} position={[0,H/2-.33,D/2+.02]}><meshBasicMaterial color="#05081A"/></RoundedBox>
   </group>;
@@ -89,41 +98,41 @@ function Lights(){
 }
 
 /** Renders only while visible, and stays still for people who prefer reduced motion. */
-function Stage({className,camera,children}:{className:string;camera:{position:[number,number,number];fov:number};children:ReactNode}){
+function Stage({className,camera,children,overlay}:{className:string;camera:{position:[number,number,number];fov:number};children:ReactNode;overlay?:ReactNode}){
   const box=useRef<HTMLDivElement>(null);const [visible,setVisible]=useState(true);
   const still=typeof window!=="undefined"&&matchMedia("(prefers-reduced-motion: reduce)").matches;
   useEffect(()=>{const io=new IntersectionObserver(([e])=>setVisible(e.isIntersecting));if(box.current)io.observe(box.current);return()=>io.disconnect();},[]);
-  return <div ref={box} className={`relative isolate ${className}`}>
+  return <div ref={box} className={`relative isolate overflow-hidden ${className}`}>
     <PortalCtx.Provider value={box}><Canvas shadows dpr={[1,2]} frameloop={!visible?"never":still?"demand":"always"} camera={camera} gl={{antialias:true,alpha:true}}>
       <Lights/>{children}
     </Canvas></PortalCtx.Provider>
+    {overlay}
   </div>;
 }
 
-/** Notification anchored to a point of the 3D scene, so it moves with the device it belongs to. */
-function Toast({position,shift,icon:I,color,app,title,body,delay}:{position:[number,number,number];shift:string;icon:LucideIcon;color:string;app:string;title:string;body:string;delay:string}){
-  return <Html position={position} zIndexRange={[16777300,16777290]} style={{pointerEvents:"none"}}>
-    <div style={{transform:shift}}>
-      <div className="anim-pop flex w-[244px] gap-3 rounded-2xl border border-white/70 bg-white/90 p-3 shadow-[0_20px_40px_-14px_rgba(11,40,140,.4)] backdrop-blur-md" style={{animationDelay:delay}}>
+/** Notifications are regular DOM overlays, so React owns their lifecycle. */
+function Toast({className,icon:I,color,app,title,body,delay}:{className:string;icon:LucideIcon;color:string;app:string;title:string;body:string;delay:string}){
+  return <div className={`pointer-events-none absolute ${className}`} style={{zIndex:16777300}}>
+      <div className="anim-pop flex w-[244px] max-w-full gap-3 rounded-2xl border border-white/70 bg-white/90 p-3 shadow-[0_20px_40px_-14px_rgba(11,40,140,.4)] backdrop-blur-md" style={{animationDelay:delay}}>
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white" style={{background:color}}><I className="h-5 w-5" strokeWidth={2}/></span>
         <span className="min-w-0 leading-tight"><span className="flex justify-between text-[11px] text-slate-400"><span className="font-semibold">{app}</span><span>maintenant</span></span>
           <b className="mt-0.5 block text-[13px] text-brand-ink">{title}</b><span className="mt-0.5 block text-xs text-slate-500">{body}</span></span>
       </div>
-    </div>
-  </Html>;
+  </div>;
 }
 
 export function HeroDevices3D({className=""}:{className?:string}){
   const hero=useRef<THREE.Group>(null);
   // FitCamera frames the devices to fill the canvas at any size, with a small margin so nothing is cut.
-  return <Stage className={className} camera={{position:[-.5,3.4,14],fov:30}}>
-    <Parallax amount={.05}>
+  return <Stage className={className} camera={{position:[-.5,3.4,14],fov:30}} overlay={<>
+    <Toast className="left-[38%] top-[3%] hidden sm:block" icon={MessageCircle} color="#25D366" app="WhatsApp" title="Rappel envoyé à Paul A." body="44 000 F à régler avant le 05/11" delay="1.1s"/>
+    <Toast className="bottom-[15%] left-[7%] hidden sm:block" icon={CircleCheck} color="#10C978" app="ImmoPay" title="Paiement reçu : 110 000 F" body="Via MTN MoMo · quittance envoyée" delay="1.7s"/>
+  </>}>
+    <Parallax amount={.025}>
       <group ref={hero}>
         <Laptop3D src="/dashboard" position={[-1.6,0,-.6]} rotation={[0,.3,0]}/>
-        <Phone3D position={[3.05,2.55,2]} rotation={[-.05,-.38,.03]} src="/espace-locataire"/>
-      </group><FitCamera target={hero} dir={[-.03,.24,1]} margin={.94}/>
-      <Toast position={[2.1,4.9,2.3]} shift="translate(-96%,-62%)" icon={MessageCircle} color="#25D366" app="WhatsApp" title="Rappel envoyé à Paul A." body="44 000 F à régler avant le 05/11" delay="1.1s"/>
-      <Toast position={[-4.9,.35,1.9]} shift="translate(-12%,-35%)" icon={CircleCheck} color="#10C978" app="ImmoPay" title="Paiement reçu : 110 000 F" body="Via MTN MoMo · quittance envoyée" delay="1.7s"/>
+        <Phone3D position={[2.75,2.5,2]} rotation={[-.05,-.32,.03]} screen="/demo-screens/tenant-home.png"/>
+      </group><FitCamera target={hero} dir={[-.03,.24,1]} margin={.86}/>
       <ContactShadows position={[0,-.01,0]} opacity={.35} scale={18} blur={2.4} far={5} color="#0B3FD6"/>
     </Parallax>
   </Stage>;
@@ -134,8 +143,8 @@ export function TenantPhones3D({className=""}:{className?:string}){
   return <Stage className={className} camera={{position:[0,.6,14],fov:30}}>
     <Parallax amount={.1}>
       <group ref={phones}>
-        <Phone3D position={[-1.45,-.25,-.8]} rotation={[0,.42,.04]} src="/verify/IMP-26-09A3"/>
-        <Phone3D position={[1.5,.2,.4]} rotation={[0,-.38,-.03]} src="/espace-locataire/quittances"/>
+        <Phone3D position={[-1.45,-.25,-.8]} rotation={[0,.42,.04]} screen="/demo-screens/receipt-verify.png"/>
+        <Phone3D position={[1.5,.2,.4]} rotation={[0,-.38,-.03]} screen="/demo-screens/tenant-receipts.png"/>
       </group><FitCamera target={phones} dir={[0,.05,1]} margin={.9}/>
       <ContactShadows position={[0,-3,0]} opacity={.3} scale={12} blur={2.6} far={4} color="#0B3FD6"/>
     </Parallax>

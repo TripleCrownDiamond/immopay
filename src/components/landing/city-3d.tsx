@@ -1,7 +1,7 @@
 "use client";
-import {useMemo,useRef} from "react";
-import {Canvas,useFrame} from "@react-three/fiber";
-import {ContactShadows,Environment,Html,Lightformer,RoundedBox} from "@react-three/drei";
+import {useEffect,useMemo,useRef,type RefObject} from "react";
+import {Canvas,useFrame,useThree} from "@react-three/fiber";
+import {ContactShadows,Environment,Lightformer,RoundedBox} from "@react-three/drei";
 import * as THREE from "three";
 import {FitCamera} from "./fit-camera";
 
@@ -54,7 +54,7 @@ function buildWindows(specs:Spec[]):Win[]{
   return out;
 }
 
-function Building({x,z,w,d,floors,accent=false,tag,label}:Spec){
+function Building({x,z,w,d,floors,accent=false,tag}:Spec){
   const fh=FH,h=floors*fh+.25;
   const slabs=[];for(let f=1;f<floors;f++)slabs.push(f*fh);
   return <group>
@@ -68,7 +68,6 @@ function Building({x,z,w,d,floors,accent=false,tag,label}:Spec){
     </group>)}
     {/* roof parapet and rooftop block */}
     <mesh position={[x,h+.06,z]} castShadow><boxGeometry args={[w*1.02,.12,d*1.02]}/><meshStandardMaterial color={tag??"#DCE5F7"} roughness={.5}/></mesh>
-    {label&&<Html position={[x,h+.75,z]} center zIndexRange={[20,0]} style={{pointerEvents:"none"}}><span className="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-brand-ink shadow-md"><span className="h-2 w-2 rounded-full" style={{background:tag}}/>{label}</span></Html>}
     <mesh position={[x-w*.2,h+.28,z-d*.15]} castShadow><boxGeometry args={[w*.3,.32,d*.3]}/><meshStandardMaterial color="#C9D6F0" roughness={.6}/></mesh>
   </group>;
 }
@@ -81,11 +80,30 @@ function Tree({x,z,s=1}:{x:number;z:number;s?:number}){
   </group>;
 }
 
-function Scene({still,variant}:{still:boolean;variant:Variant}){
+function Scene({still,variant,labelsRef}:{still:boolean;variant:Variant;labelsRef:RefObject<HTMLDivElement|null>}){
   const cfg=SCENES[variant];
   const group=useRef<THREE.Group>(null);
   const wins=useMemo(()=>buildWindows(cfg.specs),[cfg]);
-  useFrame(({clock})=>{if(group.current&&!still)group.current.rotation.y=-.35+Math.sin(clock.elapsedTime*.18)*.12;});
+  const labelSpecs=useMemo(()=>cfg.specs.filter(spec=>spec.label),[cfg]);
+  const invalidate=useThree(state=>state.invalidate);
+  useEffect(()=>{if(variant==="agency")invalidate();},[invalidate,variant]);
+  useFrame(({clock,camera,size})=>{
+    const model=group.current,labels=labelsRef.current;
+    if(!model)return;
+    if(!still)model.rotation.y=-.35+Math.sin(clock.elapsedTime*.18)*.12;
+    if(!labels)return;
+    model.updateWorldMatrix(true,false);
+    camera.updateMatrixWorld();
+    labelSpecs.forEach((spec,i)=>{
+      const el=labels.children[i] as HTMLElement|undefined;
+      if(!el)return;
+      const height=spec.floors*FH+.25;
+      const point=new THREE.Vector3(spec.x,height+.75,spec.z).applyMatrix4(model.matrixWorld).project(camera);
+      el.style.left=`${(point.x*.5+.5)*size.width}px`;
+      el.style.top=`${(-point.y*.5+.5)*size.height}px`;
+      el.style.visibility=point.z<1?"visible":"hidden";
+    });
+  });
   return <><group ref={group} rotation={[0,-.35,0]}>
     <RoundedBox args={[cfg.ground[0],.3,cfg.ground[1]]} radius={.14} position={[0,-.15,0]} receiveShadow><meshStandardMaterial color="#EAF1FF" roughness={.8}/></RoundedBox>
     <mesh position={[0,.005,cfg.ground[1]/2-.75]} receiveShadow><boxGeometry args={[cfg.ground[0]-.2,.02,.9]}/><meshStandardMaterial color="#FFFFFF" roughness={.7}/></mesh>
@@ -98,7 +116,8 @@ function Scene({still,variant}:{still:boolean;variant:Variant}){
 
 export default function City3D({className="",variant="owner"}:{className?:string;variant?:Variant}){
   const still=typeof window!=="undefined"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  return <div className={className} role="img" aria-label={SCENES[variant].label}>
+  const labelsRef=useRef<HTMLDivElement>(null);
+  return <div className={`relative overflow-hidden ${className}`} role="img" aria-label={SCENES[variant].label}>
     <Canvas shadows dpr={[1,2]} frameloop={still?"demand":"always"} camera={{position:[11,8.5,12.5],fov:30}} gl={{antialias:true,alpha:true}}>
       <ambientLight intensity={.9}/>
       <hemisphereLight args={["#EAF1FF","#D3F5E5",.7]}/>
@@ -108,8 +127,13 @@ export default function City3D({className="",variant="owner"}:{className?:string
         <Lightformer form="rect" intensity={1.2} position={[-6,3,4]} scale={[6,6,1]} color="#FFFFFF"/>
         <Lightformer form="circle" intensity={1.5} position={[6,4,4]} scale={3} color="#C9F7E2"/>
       </Environment>
-      <Scene still={still} variant={variant}/>
+      <Scene still={still} variant={variant} labelsRef={labelsRef}/>
       <ContactShadows position={[0,-.31,0]} opacity={.35} scale={14} blur={2.6} far={4} color="#0B3FD6"/>
     </Canvas>
+    {variant==="agency"&&<div ref={labelsRef} className="pointer-events-none absolute inset-0" aria-hidden="true">
+      {SCENES.agency.specs.filter(spec=>spec.label).map(spec=><div key={spec.label} className="absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200 bg-white/95 px-2.5 py-1 text-xs font-bold leading-none text-brand-ink shadow-md" style={{visibility:"hidden"}}>
+        <span className="h-2 w-2 shrink-0 rounded-full" style={{background:spec.tag}}/>{spec.label}
+      </div>)}
+    </div>}
   </div>;
 }
