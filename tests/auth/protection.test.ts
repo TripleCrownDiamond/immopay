@@ -15,7 +15,7 @@ describe("private route matcher", () => {
   });
 
   it("leaves the marketing and authentication routes public", () => {
-    for (const path of ["/", "/login", "/signup", "/api/auth"]) {
+    for (const path of ["/", "/login", "/signup", "/signup/agence", "/invitation/token", "/api/auth"]) {
       expect(config.matcher.some((pattern: string) => pattern === path)).toBe(false);
     }
   });
