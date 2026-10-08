@@ -10,3 +10,4 @@ out
 .neon
 .codex/config.toml
 .superpowers/
+test-results/

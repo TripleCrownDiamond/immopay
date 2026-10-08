@@ -71,3 +71,15 @@ export async function listPayments(userId: string, organizationId?: string, db: 
     WHERE p.organization_id=$1 ORDER BY p.paid_at DESC NULLS LAST,p.id`, [membership.organizationId]);
   return {membership, rows: result.rows.map(row => ({...row, amount: Number(row.amount)}))};
 }
+
+export async function listReceipts(userId: string, organizationId?: string, db: Queryable = getPool()) {
+  const membership = await requireOrganization(userId, organizationId, db);
+  const result = await db.query(`SELECT r.public_code AS "publicCode", t.full_name AS tenant,
+    to_char(d.period_start,'YYYY-MM') AS period, r.amount::text AS amount
+    FROM receipts r
+    JOIN rent_dues d ON d.id=r.rent_due_id AND d.organization_id=r.organization_id
+    JOIN leases l ON l.id=d.lease_id AND l.organization_id=d.organization_id
+    JOIN tenants t ON t.id=l.tenant_id AND t.organization_id=l.organization_id
+    WHERE r.organization_id=$1 ORDER BY r.issued_at DESC,r.id`, [membership.organizationId]);
+  return {membership, rows: result.rows.map(row => ({...row, amount: Number(row.amount)}))};
+}

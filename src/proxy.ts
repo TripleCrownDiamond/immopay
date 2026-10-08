@@ -14,6 +14,6 @@ export const config = {
     "/dues/:path*", "/payments/:path*", "/receipts/:path*",
     "/reports/:path*", "/settings/:path*", "/messages/:path*",
     "/quick-add/:path*", "/units/:path*", "/leases/:path*",
-    "/onboarding/:path*", "/espace-locataire/:path*",
+    "/onboarding/:path*", "/espace-locataire", "/espace-locataire/((?!connexion).*)",
   ],
 };

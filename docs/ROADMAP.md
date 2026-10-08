@@ -13,8 +13,10 @@
 - [x] Lease creation UI
 - [x] Rent schedule generator
 - [x] Partial payment allocation/domain status
-- [ ] Migrer le modèle métier vers Neon et connecter les formulaires
-- [ ] Auth/session middleware
+- [x] Modèle métier Neon, migration versionnée et seed de démonstration
+- [x] Neon Auth, session et contrôles de rôle côté serveur
+- [x] Lecture des données Neon dans les trois espaces
+- [ ] Connecter les formulaires d'écriture métier
 - [ ] Tenant invitations
 
 ## Phase 3 — Money
