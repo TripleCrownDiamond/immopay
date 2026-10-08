@@ -1,4 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-:root{--navy:#0B1225;--blue:#4F46FF;--green:#14B88A;--bg:#F6F7FA}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--navy);font-family:Arial,Helvetica,sans-serif}
+:root{--navy:#071440;--blue:#1557FF;--green:#10C978;--bg:#F6F7FA}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--navy)}
+:focus-visible{outline:3px solid #1557FF;outline-offset:3px;border-radius:8px}
+
+/* ---------- motion ---------- */
+@keyframes rise{from{opacity:0;translate:0 48px}to{opacity:1;translate:0 0}}
+@keyframes pop{0%{opacity:0;scale:.6}70%{opacity:1;scale:1.05}100%{opacity:1;scale:1}}
+@keyframes float{0%,100%{translate:0 0}50%{translate:0 -12px}}
+@keyframes fill{from{width:0}}
+@keyframes draw{from{stroke-dashoffset:var(--len,600)}to{stroke-dashoffset:0}}
+@keyframes ping-soft{0%{box-shadow:0 0 0 0 rgba(16,201,120,.5)}100%{box-shadow:0 0 0 14px rgba(16,201,120,0)}}
+@keyframes sweep{0%{translate:0 -100%}100%{translate:0 100%}}
+.anim-rise{animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+.anim-pop{animation:pop .6s cubic-bezier(.2,.8,.2,1) both}
+.anim-float{animation:float 6s ease-in-out infinite}
+.anim-fill{animation:fill 1.6s cubic-bezier(.2,.8,.2,1) .6s both}
+.anim-draw{stroke-dasharray:var(--len,600);animation:draw 2.2s ease-out .4s both}
+.anim-ping{animation:ping-soft 1.8s ease-out infinite}
+.anim-sweep{animation:sweep 2.6s ease-in-out infinite}
+.d-1{animation-delay:.15s}.d-2{animation-delay:.35s}.d-3{animation-delay:.7s}.d-4{animation-delay:1s}.d-5{animation-delay:1.3s}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}

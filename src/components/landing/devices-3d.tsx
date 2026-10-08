@@ -1,0 +1,143 @@
+"use client";
+import {createContext,useContext,useEffect,useMemo,useRef,useState,type ReactNode,type RefObject} from "react";
+import {Canvas,useFrame,type ThreeElements} from "@react-three/fiber";
+import {ContactShadows,Environment,Float,Html,Lightformer,RoundedBox} from "@react-three/drei";
+import * as THREE from "three";
+import {FitCamera} from "./fit-camera";
+import {CircleCheck,MessageCircle,type LucideIcon} from "lucide-react";
+
+// Stable DOM target for screen HTML. Without it, drei re-creates the HTML root once the canvas
+// mounts, and one of several screens can end up empty.
+const PortalCtx=createContext<RefObject<HTMLDivElement|null>|null>(null);
+
+function roundedRect(w:number,h:number,r:number){
+  const s=new THREE.Shape(),x=-w/2,y=-h/2;
+  s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);
+  return new THREE.ShapeGeometry(s,10);
+}
+
+/**
+ * A real page of the app, rendered at the device's viewport size (so the app's own
+ * responsive layout applies) and shown on the device screen. The HTML sits behind the canvas and a rounded
+ * plane "punches" a transparent hole in it, so 3D objects in front still hide the screen.
+ */
+function Screen({w,h,px,radius,src,statusBar=false}:{w:number;h:number;px:number;radius:number;src:string;statusBar?:boolean}){
+  const geo=useMemo(()=>roundedRect(w,h,radius),[w,h,radius]);
+  const pxH=Math.round(px*h/w), pxR=Math.round(px*radius/w), portal=useContext(PortalCtx);
+  return <Html transform occlude="blending" portal={(portal??undefined) as RefObject<HTMLElement>|undefined} distanceFactor={400*w/px} geometry={<primitive object={geo}/>}
+    material={<meshBasicMaterial transparent opacity={0} blending={THREE.NoBlending} side={THREE.DoubleSide}/>}>
+    <div style={{width:px,height:pxH,borderRadius:pxR,overflow:"hidden",background:"#F6F7FA"}} aria-hidden="true">
+      {statusBar&&<div style={{height:STATUS_H}} className="flex items-center justify-between bg-white px-8 pt-1 text-[15px] font-semibold text-brand-ink">
+        <span>9:41</span><span className="flex items-center gap-1.5"><span className="h-2.5 w-5 rounded-sm bg-brand-ink/80"/><span className="h-3 w-6 rounded-[4px] border-2 border-brand-ink/80 p-[1px]"><span className="block h-full w-3/4 rounded-[1px] bg-brand-ink/80"/></span></span>
+      </div>}
+      <iframe src={src} title="" tabIndex={-1} loading="lazy" scrolling="no" style={{width:px,height:pxH-(statusBar?STATUS_H:0),border:0,pointerEvents:"none",display:"block"}}/>
+    </div>
+  </Html>;
+}
+
+const STATUS_H=46;
+const BODY=<meshPhysicalMaterial color="#1A2145" metalness={.75} roughness={.28} clearcoat={1} clearcoatRoughness={.15}/>;
+const ALU={color:"#DCE2EE",metalness:.55,roughness:.32} as const;
+
+function Phone3D({src,...props}:{src:string}&ThreeElements["group"]){
+  const W=2.3,H=4.85,D=.26;
+  return <group {...props}>
+    <RoundedBox args={[W,H,D]} radius={.32} smoothness={6} castShadow>{BODY}</RoundedBox>
+    {/* side buttons */}
+    <mesh position={[W/2+.012,.9,0]}><boxGeometry args={[.03,.55,.1]}/><meshStandardMaterial color="#2A3360" metalness={.8} roughness={.3}/></mesh>
+    <mesh position={[-W/2-.012,1.1,0]}><boxGeometry args={[.03,.35,.1]}/><meshStandardMaterial color="#2A3360" metalness={.8} roughness={.3}/></mesh>
+    <group position={[0,0,D/2+.004]}><Screen w={2.12} h={4.66} px={390} radius={.26} src={src} statusBar/></group>
+    {/* dynamic island */}
+    <RoundedBox args={[.62,.18,.02]} radius={.08} smoothness={4} position={[0,H/2-.33,D/2+.02]}><meshBasicMaterial color="#05081A"/></RoundedBox>
+  </group>;
+}
+
+function Laptop3D({src,...props}:{src:string}&ThreeElements["group"]){
+  const W=7.2,D=4.8;
+  return <group {...props}>
+    <RoundedBox args={[W,.2,D]} radius={.09} smoothness={4} position={[0,.1,0]} castShadow receiveShadow><meshStandardMaterial {...ALU}/></RoundedBox>
+    <mesh position={[0,.205,-.45]}><boxGeometry args={[W*.86,.01,2.3]}/><meshStandardMaterial color="#B9C1D2" roughness={.6}/></mesh>
+    <mesh position={[0,.205,1.45]}><boxGeometry args={[2.3,.01,1.35]}/><meshStandardMaterial color="#CBD2E0" roughness={.4} metalness={.4}/></mesh>
+    {/* lid hinged on the back edge, opened ~105° */}
+    <group position={[0,.2,-D/2+.05]} rotation={[-.26,0,0]}>
+      <RoundedBox args={[W,4.6,.13]} radius={.09} smoothness={4} position={[0,2.3,0]} castShadow><meshStandardMaterial {...ALU}/></RoundedBox>
+      <mesh position={[0,2.3,.067]}><planeGeometry args={[W-.16,4.44]}/><meshStandardMaterial color="#070B1D" roughness={.3}/></mesh>
+      <group position={[0,2.36,.072]}><Screen w={6.7} h={4.19} px={1024} radius={.06} src={src}/></group>
+    </group>
+  </group>;
+}
+
+/** Tilts the scene toward the mouse. The canvas ignores pointer events, so track the window. */
+function Parallax({children,amount=.12}:{children:ReactNode;amount?:number}){
+  const ref=useRef<THREE.Group>(null);const target=useRef({x:0,y:0});
+  useEffect(()=>{const on=(e:PointerEvent)=>{target.current={x:e.clientX/innerWidth*2-1,y:e.clientY/innerHeight*2-1};};addEventListener("pointermove",on);return()=>removeEventListener("pointermove",on);},[]);
+  useFrame(()=>{const g=ref.current;if(!g)return;g.rotation.y+=(target.current.x*amount-g.rotation.y)*.05;g.rotation.x+=(target.current.y*amount*.5-g.rotation.x)*.05;});
+  return <group ref={ref}>{children}</group>;
+}
+
+function Lights(){
+  return <>
+    <ambientLight intensity={.8}/>
+    <directionalLight position={[5,9,8]} intensity={2} castShadow shadow-mapSize={[1024,1024]}/>
+    <Environment resolution={256}>
+      <Lightformer form="rect" intensity={3} position={[0,5,6]} scale={[10,3,1]} color="#FFFFFF"/>
+      <Lightformer form="rect" intensity={2} position={[-7,2,2]} scale={[4,8,1]} color="#CFE0FF"/>
+      <Lightformer form="circle" intensity={2} position={[7,3,1]} scale={3} color="#C9F7E2"/>
+    </Environment>
+  </>;
+}
+
+/** Renders only while visible, and stays still for people who prefer reduced motion. */
+function Stage({className,camera,children}:{className:string;camera:{position:[number,number,number];fov:number};children:ReactNode}){
+  const box=useRef<HTMLDivElement>(null);const [visible,setVisible]=useState(true);
+  const still=typeof window!=="undefined"&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  useEffect(()=>{const io=new IntersectionObserver(([e])=>setVisible(e.isIntersecting));if(box.current)io.observe(box.current);return()=>io.disconnect();},[]);
+  return <div ref={box} className={`relative isolate ${className}`}>
+    <PortalCtx.Provider value={box}><Canvas shadows dpr={[1,2]} frameloop={!visible?"never":still?"demand":"always"} camera={camera} gl={{antialias:true,alpha:true}}>
+      <Lights/>{children}
+    </Canvas></PortalCtx.Provider>
+  </div>;
+}
+
+/** Notification anchored to a point of the 3D scene, so it moves with the device it belongs to. */
+function Toast({position,shift,icon:I,color,app,title,body,delay}:{position:[number,number,number];shift:string;icon:LucideIcon;color:string;app:string;title:string;body:string;delay:string}){
+  return <Html position={position} zIndexRange={[16777300,16777290]} style={{pointerEvents:"none"}}>
+    <div style={{transform:shift}}>
+      <div className="anim-pop flex w-[244px] gap-3 rounded-2xl border border-white/70 bg-white/90 p-3 shadow-[0_20px_40px_-14px_rgba(11,40,140,.4)] backdrop-blur-md" style={{animationDelay:delay}}>
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white" style={{background:color}}><I className="h-5 w-5" strokeWidth={2}/></span>
+        <span className="min-w-0 leading-tight"><span className="flex justify-between text-[11px] text-slate-400"><span className="font-semibold">{app}</span><span>maintenant</span></span>
+          <b className="mt-0.5 block text-[13px] text-brand-ink">{title}</b><span className="mt-0.5 block text-xs text-slate-500">{body}</span></span>
+      </div>
+    </div>
+  </Html>;
+}
+
+export function HeroDevices3D({className=""}:{className?:string}){
+  const hero=useRef<THREE.Group>(null);
+  // FitCamera frames the devices to fill the canvas at any size, with a small margin so nothing is cut.
+  return <Stage className={className} camera={{position:[-.5,3.4,14],fov:30}}>
+    <Parallax amount={.05}>
+      <group ref={hero}>
+        <Laptop3D src="/dashboard" position={[-1.6,0,-.6]} rotation={[0,.3,0]}/>
+        <Phone3D position={[3.05,2.55,2]} rotation={[-.05,-.38,.03]} src="/espace-locataire"/>
+      </group><FitCamera target={hero} dir={[-.03,.24,1]} margin={.94}/>
+      <Toast position={[2.1,4.9,2.3]} shift="translate(-96%,-62%)" icon={MessageCircle} color="#25D366" app="WhatsApp" title="Rappel envoyé à Paul A." body="44 000 F à régler avant le 05/11" delay="1.1s"/>
+      <Toast position={[-4.9,.35,1.9]} shift="translate(-12%,-35%)" icon={CircleCheck} color="#10C978" app="ImmoPay" title="Paiement reçu : 110 000 F" body="Via MTN MoMo · quittance envoyée" delay="1.7s"/>
+      <ContactShadows position={[0,-.01,0]} opacity={.35} scale={18} blur={2.4} far={5} color="#0B3FD6"/>
+    </Parallax>
+  </Stage>;
+}
+
+export function TenantPhones3D({className=""}:{className?:string}){
+  const phones=useRef<THREE.Group>(null);
+  return <Stage className={className} camera={{position:[0,.6,14],fov:30}}>
+    <Parallax amount={.1}>
+      <group ref={phones}>
+        <Phone3D position={[-1.45,-.25,-.8]} rotation={[0,.42,.04]} src="/verify/IMP-26-09A3"/>
+        <Phone3D position={[1.5,.2,.4]} rotation={[0,-.38,-.03]} src="/espace-locataire/quittances"/>
+      </group><FitCamera target={phones} dir={[0,.05,1]} margin={.9}/>
+      <ContactShadows position={[0,-3,0]} opacity={.3} scale={12} blur={2.6} far={4} color="#0B3FD6"/>
+    </Parallax>
+  </Stage>;
+}

@@ -1,3 +1,163 @@
 import Link from "next/link";
-const features=[["Rappels automatiques","Email, WhatsApp, SMS et push selon votre formule."],["Paiements simplifiés","Suivez Mobile Money, carte et paiements enregistrés."],["Quittances vérifiables","Chaque quittance possède une référence et un QR vérifiable."],["Suivi en temps réel","Voyez immédiatement qui a payé, partiellement payé ou doit encore."],["Gestion multi-biens","Immeubles, maisons, boutiques et bureaux dans un seul espace."]];
-export default function Landing(){return <main className="min-h-screen bg-white text-[#0B1225]"><header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8"><Link href="/" className="inline-flex"><img src="/brand/immopay-logo.png" alt="ImmoPay" className="h-9 sm:h-10 w-auto"/></Link><nav className="hidden gap-8 text-sm text-slate-600 md:flex"><a href="#features">Fonctionnalités</a><a href="#pricing">Tarifs</a><a href="#faq">FAQ</a><a href="#about">À propos</a></nav><div className="flex items-center gap-3"><Link href="/login" className="hidden text-sm font-semibold sm:block">Se connecter</Link><Link href="/signup" className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white">Commencer gratuitement</Link></div></header><section className="relative overflow-hidden border-t bg-gradient-to-b from-indigo-50/60 via-white to-white"><div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 lg:grid-cols-2 lg:px-8 lg:py-28"><div><span className="rounded-full border border-indigo-100 bg-white px-3 py-1.5 text-xs font-bold tracking-wider text-indigo-600">GESTION LOCATIVE SIMPLIFIÉE</span><h1 className="mt-6 max-w-xl text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">Vos loyers.<br/><span className="text-indigo-600">Automatiquement.</span></h1><p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">Suivez vos biens, automatisez les rappels, encaissez vos paiements et générez des quittances vérifiables depuis un seul endroit.</p><div className="mt-8 flex flex-wrap gap-3"><Link href="/signup" className="rounded-xl bg-indigo-600 px-6 py-3.5 font-semibold text-white shadow-lg shadow-indigo-100">Commencer gratuitement</Link><Link href="/dashboard" className="rounded-xl border border-slate-200 bg-white px-6 py-3.5 font-semibold">Voir la démo</Link></div><div className="mt-7 flex flex-wrap gap-5 text-sm text-slate-500"><span>✓ Simple à utiliser</span><span>✓ Sécurisé</span><span>✓ Adapté à l’Afrique</span></div></div><div className="relative"><div className="rounded-[28px] border bg-white p-4 shadow-2xl shadow-indigo-100"><div className="rounded-2xl bg-[#F6F7FA] p-5"><div className="flex justify-between"><b>Tableau de bord</b><span className="text-xs text-slate-400">Octobre 2026</span></div><div className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-xl bg-white p-4"><small className="text-slate-400">Encaissé</small><b className="mt-1 block text-xl">1 420 000 F</b></div><div className="rounded-xl bg-white p-4"><small className="text-slate-400">Restant</small><b className="mt-1 block text-xl">430 000 F</b></div></div><div className="mt-3 rounded-xl bg-white p-4"><div className="flex justify-between text-sm"><b>Recouvrement</b><b className="text-emerald-500">77%</b></div><div className="mt-3 h-2 rounded-full bg-slate-100"><div className="h-full w-[77%] rounded-full bg-emerald-500"/></div></div></div></div><div className="absolute -bottom-8 -left-5 hidden w-52 rounded-2xl border bg-white p-4 shadow-xl sm:block"><span className="text-xs text-slate-400">Paiement reçu</span><b className="mt-1 block">+110 000 F</b><span className="text-xs text-emerald-600">Quittance générée ✓</span></div></div></div></section><section id="features" className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="max-w-2xl"><span className="text-sm font-bold text-indigo-600">TOUT AU MÊME ENDROIT</span><h2 className="mt-3 text-4xl font-bold tracking-tight">Moins de relances. Plus de visibilité.</h2></div><div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-5">{features.map(([t,d])=><article key={t} className="rounded-2xl border border-slate-100 bg-slate-50/70 p-5"><div className="mb-5 h-10 w-10 rounded-xl bg-indigo-100"/><h3 className="font-bold">{t}</h3><p className="mt-2 text-sm leading-6 text-slate-500">{d}</p></article>)}</div></section><section className="bg-[#0B1225] text-white"><div className="mx-auto grid max-w-7xl gap-12 px-5 py-20 lg:grid-cols-2 lg:px-8"><div><span className="text-sm font-bold text-emerald-400">POUR LES PROPRIÉTAIRES</span><h2 className="mt-3 text-4xl font-bold">Une gestion locative sans stress</h2><p className="mt-5 max-w-xl text-slate-300">Ajoutez vos biens et vos locataires. ImmoPay transforme vos contrats en échéances, suit les encaissements et vous signale ce qui mérite votre attention.</p></div><div className="grid grid-cols-2 gap-3">{["Biens & logements","Contrats & échéances","Paiements & impayés","Rapports clairs"].map(x=><div key={x} className="rounded-2xl bg-white/10 p-5 font-semibold">{x}</div>)}</div></div></section><section className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="grid items-center gap-12 lg:grid-cols-2"><div className="rounded-[32px] bg-emerald-50 p-8"><div className="mx-auto max-w-xs rounded-[28px] bg-white p-5 shadow-xl"><small className="text-slate-400">Votre loyer</small><h3 className="mt-2 text-3xl font-bold">110 000 F</h3><p className="mt-1 text-sm text-slate-500">À payer avant le 05 novembre</p><button className="mt-6 w-full rounded-xl bg-indigo-600 p-3 font-semibold text-white">Payer mon loyer</button><div className="mt-5 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">Vos quittances restent disponibles ici.</div></div></div><div><span className="text-sm font-bold text-emerald-600">POUR LES LOCATAIRES</span><h2 className="mt-3 text-4xl font-bold">Payez facilement. Gardez vos preuves.</h2><p className="mt-5 text-lg text-slate-600">Échéances, paiements partiels, historique et quittances sont accessibles depuis le téléphone.</p></div></div></section><section id="pricing" className="bg-slate-50"><div className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="text-center"><h2 className="text-4xl font-bold">Un tarif adapté à votre portefeuille</h2><p className="mt-3 text-slate-500">Commencez petit, évoluez quand vous en avez besoin.</p></div><div className="mx-auto mt-10 grid max-w-4xl gap-4 md:grid-cols-3">{[["Starter","Gratuit","Pour démarrer"],["Pro","Bientôt","Pour automatiser"],["Business","Sur mesure","Pour les grands portefeuilles"]].map(([n,p,d],i)=><article key={n} className={`rounded-3xl bg-white p-7 ${i===1?"ring-2 ring-indigo-600":"border"}`}><h3 className="font-bold">{n}</h3><strong className="mt-4 block text-3xl">{p}</strong><p className="mt-2 text-sm text-slate-500">{d}</p><Link href="/signup" className="mt-7 block rounded-xl bg-[#0B1225] p-3 text-center text-sm font-semibold text-white">Commencer</Link></article>)}</div></div></section><section id="faq" className="mx-auto max-w-3xl px-5 py-20"><h2 className="text-center text-4xl font-bold">Questions fréquentes</h2><div className="mt-10 space-y-3">{["Comment fonctionne le paiement ?","Quels moyens de paiement seront disponibles ?","Puis-je commencer gratuitement ?","Mes données sont-elles sécurisées ?"].map(q=><details key={q} className="rounded-2xl border p-5"><summary className="cursor-pointer font-semibold">{q}</summary><p className="mt-3 text-sm leading-6 text-slate-500">ImmoPay centralise le suivi et automatise les opérations tout en gardant une trace vérifiable des actions importantes.</p></details>)}</div></section><footer id="about" className="border-t"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-10 text-sm text-slate-500 sm:flex-row sm:justify-between lg:px-8"><span><img src="/brand/immopay-logo.png" alt="ImmoPay" className="h-7 w-auto"/></span><span>Vos loyers. Automatiquement.</span><span>© 2026 ImmoPay</span></div></footer></main>}
+import {ArrowRight,Bell,Building2,ChartColumn,ChevronDown,CircleCheck,CreditCard,Crown,FileCheck2,FileText,History,MessageCircle,Play,ShieldCheck,TrendingUp,UserRoundSearch} from "lucide-react";
+import {QrMark,Sparkline} from "@/components/landing/illustrations";
+import {AgencyDistrict3DLazy,City3DLazy,HeroDevices3DLazy,TenantPhones3DLazy} from "@/components/landing/lazy-3d";
+import {SiteFooter} from "@/components/site-footer";
+import {Benefits} from "@/components/landing/benefits";
+
+const features=[
+  [Bell,"Rappels automatiques","Email, WhatsApp ou SMS selon votre formule."],
+  [CreditCard,"Paiements en ligne","Mobile Money, carte bancaire et paiements enregistrés."],
+  [FileCheck2,"Quittances vérifiables","Chaque quittance a une référence et un code QR."],
+  [ChartColumn,"Suivi en temps réel","Encaissements, impayés et statistiques."],
+  [Building2,"Gestion multi-biens","Appartements, boutiques, bureaux et maisons."],
+] as const;
+const owners=["Ajoutez vos biens et vos locataires en quelques minutes","Planifiez les échéances selon vos contrats","Suivez les paiements et les impayés en temps réel","Retrouvez un locataire déjà inscrit sur ImmoPay","Téléchargez des rapports clairs"];
+const agencyPoints=["Un espace par propriétaire mandant, sans mélange","Gestionnaires, comptables et agents avec leurs propres accès","Rapport mensuel et reversement calculés pour chaque client","Quittances et rappels à l’image de votre agence"];
+const tenants=["Un rappel avant chaque échéance","Paiement en quelques clics","Quittance disponible immédiatement","Toutes vos quittances, même chez vos anciens propriétaires"];
+const steps=[[Building2,"Ajoutez vos biens","Créez vos immeubles, logements et locataires."],[FileText,"Définissez les contrats","Montant, fréquence, échéances et frais éventuels."],[Bell,"ImmoPay fait le reste","Rappels automatiques, encaissements et suivi."],[CircleCheck,"Consultez vos résultats","Statistiques, rapports et quittances vérifiables."]] as const;
+const plans=[
+  {name:"Starter",tag:"Pour débuter",price:"Gratuit",icon:CreditCard,items:["Jusqu’à 3 locataires","Rappels par email","Paiements en ligne","Quittances générées automatiquement","Tableau de bord"],cta:"Commencer gratuitement"},
+  {name:"Pro",tag:"Pour les bailleurs actifs",price:"Bientôt",icon:Crown,items:["Jusqu’à 50 locataires","Rappels par email et WhatsApp","Rappels programmés avant et après l’échéance","Paiements en ligne","Quittances vérifiables avec code QR","Historique de paiement des futurs locataires, avec leur accord","Rapports avancés et export Excel / PDF","Support prioritaire"],cta:"Choisir Pro",popular:true},
+  {name:"Business",tag:"Pour les agences et grands portefeuilles",price:"Sur mesure",icon:Building2,items:["Locataires illimités","Rappels par email, WhatsApp et SMS","Plusieurs utilisateurs avec rôles (gestionnaire, comptable)","Quittances à votre logo","Rapports par propriétaire mandant","Import de vos données existantes","Accompagnement à la mise en place","Interlocuteur dédié"],cta:"Nous contacter"},
+];
+const faq=[
+  ["Comment fonctionne le paiement ?","Le locataire reçoit un rappel avec un lien de paiement. Dès que le paiement est confirmé, l’échéance est mise à jour et la quittance est générée automatiquement."],
+  ["Quels moyens de paiement sont disponibles ?","Mobile Money et carte bancaire selon les opérateurs disponibles dans votre pays. Vous pouvez aussi enregistrer un paiement reçu en espèces ou par virement."],
+  ["Mon locataire change de logement. Que devient son historique ?","Son espace locataire le suit. Il garde l’accès à toutes ses quittances, et un nouveau propriétaire peut consulter son historique de paiement s’il l’y autorise."],
+  ["Puis-je commencer gratuitement ?","Oui. La formule Starter est gratuite pour démarrer avec un petit portefeuille."],
+  ["Mes données sont-elles sécurisées ?","Les données de chaque propriétaire sont isolées, et l’historique d’un locataire n’est partagé qu’avec son accord."],
+];
+
+const Tile=({icon:I,size="md"}:{icon:typeof Bell;size?:"md"|"lg"})=><span className={`grid shrink-0 place-items-center rounded-xl bg-brand-mist text-brand-blue ${size==="lg"?"h-14 w-14":"h-11 w-11"}`}><I className={size==="lg"?"h-7 w-7":"h-5 w-5"} strokeWidth={1.75} aria-hidden/></span>;
+const Check=({dark=false}:{dark?:boolean})=><CircleCheck className={`mt-0.5 h-5 w-5 shrink-0 ${dark?"text-brand-green":"text-brand-green"}`} aria-hidden/>;
+
+export default function Landing(){return <main className="min-h-screen overflow-x-hidden bg-white text-brand-ink">
+  {/* Header */}
+  <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
+    <Link href="/" className="inline-flex"><img src="/brand/immopay-logo.png" alt="ImmoPay" className="h-9 w-auto sm:h-10"/></Link>
+    <nav className="hidden gap-8 text-sm font-medium text-slate-600 lg:flex"><a href="#avantages" className="hover:text-brand-blue">Avantages</a><a href="#agences" className="hover:text-brand-blue">Agences</a><a href="#locataires" className="hover:text-brand-blue">Locataires</a><a href="#pricing" className="hover:text-brand-blue">Tarifs</a><a href="#faq" className="hover:text-brand-blue">FAQ</a></nav>
+    <div className="flex items-center gap-2 sm:gap-3"><Link href="/login" className="hidden rounded-xl border border-brand-line bg-white px-4 py-2.5 text-sm font-semibold sm:block">Se connecter</Link><Link href="/signup" className="rounded-xl bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 hover:bg-brand-deep">Commencer gratuitement</Link></div>
+  </header>
+
+  {/* Hero */}
+  <section className="relative">
+    <div aria-hidden className="absolute -right-40 -top-40 h-[720px] w-[900px] rounded-full bg-gradient-to-br from-[#E4EDFF] via-[#EEF4FF] to-[#E3FAF0] blur-0 lg:-right-20"/>
+    <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 pb-20 pt-10 lg:grid-cols-[1fr_1.25fr] lg:px-8 lg:pb-28 lg:pt-16">
+      <div className="anim-rise">
+        <span className="inline-flex items-center gap-2 rounded-full border border-brand-line bg-white px-3 py-1.5 text-xs font-semibold text-slate-600"><span className="h-2 w-2 rounded-full bg-brand-green anim-ping"/>Gestion locative simplifiée</span>
+        <h1 className="mt-6 text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">Vos loyers.<br/><span className="text-brand-blue">Automatiquement.</span></h1>
+        <p className="mt-6 max-w-lg text-lg leading-8 text-slate-600">Pour les propriétaires et les agences immobilières : rappels automatiques, paiements en ligne ou en banque, et quittances vérifiables générées sans effort.</p>
+        <div className="mt-8 flex flex-wrap gap-3"><Link href="/signup" className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-6 py-3.5 font-semibold text-white shadow-xl shadow-blue-200 hover:bg-brand-deep">Commencer gratuitement<ArrowRight className="h-4 w-4"/></Link><Link href="/dashboard" className="inline-flex items-center gap-2 rounded-xl border border-brand-line bg-white px-6 py-3.5 font-semibold"><Play className="h-4 w-4 fill-brand-ink"/>Voir la démo</Link></div>
+        <div className="mt-8 flex flex-wrap gap-5 text-sm font-medium text-slate-600">{["Simple à utiliser","Sécurisé","Adapté à l’Afrique"].map(x=><span key={x} className="flex items-center gap-1.5"><CircleCheck className="h-5 w-5 text-brand-green"/>{x}</span>)}</div>
+      </div>
+
+      <div className="relative mx-auto aspect-[1.3/1] w-full max-w-[760px]">
+        <HeroDevices3DLazy className="anim-rise d-1 h-full w-full"/>
+      </div>
+    </div>
+  </section>
+
+  {/* Features */}
+  <section id="features" className="relative border-y border-brand-line bg-white">
+    <h2 className="sr-only">Fonctionnalités</h2>
+    <div className="mx-auto grid max-w-7xl gap-x-6 gap-y-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-5 lg:px-8">
+      {features.map(([I,t,d])=><article key={t} className="text-center">
+        <div className="flex justify-center"><Tile icon={I} size="lg"/></div>
+        <h3 className="mt-4 font-bold">{t}</h3><p className="mx-auto mt-1.5 max-w-[15rem] text-sm leading-6 text-slate-500">{d}</p>
+      </article>)}
+    </div>
+  </section>
+
+  <Benefits/>
+
+  {/* Owners */}
+  <section className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-24 lg:grid-cols-2 lg:px-8">
+    <div className="relative">
+      <div className="h-[380px] overflow-hidden rounded-[32px] bg-gradient-to-b from-[#CFE0FF] via-[#E8F0FF] to-[#E3FAF0] sm:h-[460px]"><City3DLazy className="h-full w-full"/></div>
+      <div className="anim-float absolute -bottom-8 left-4 w-[260px] rounded-2xl border border-brand-line bg-white p-4 shadow-2xl shadow-blue-100 sm:left-8">
+        <div className="flex items-center gap-3"><Tile icon={ChartColumn}/><div><span className="text-xs text-slate-500">Revenus du mois</span><b className="block text-lg">1 420 000 F</b></div><span className="ml-auto flex items-center gap-0.5 text-xs font-bold text-emerald-600"><TrendingUp className="h-3.5 w-3.5"/>12%</span></div>
+        <Sparkline className="mt-3 h-14 w-full"/>
+      </div>
+    </div>
+    <div>
+      <p className="text-sm font-bold text-brand-blue">Pour les propriétaires</p>
+      <h2 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">Une gestion locative sans stress</h2>
+      <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">Gagnez du temps, évitez les oublis et gardez une vision claire de vos revenus. ImmoPay s’occupe des relances, des paiements et des quittances.</p>
+      <ul className="mt-7 space-y-3.5">{owners.map(x=><li key={x} className="flex gap-3 text-slate-700"><Check/>{x}</li>)}</ul>
+    </div>
+  </section>
+
+  {/* Agencies */}
+  <section id="agences" className="bg-brand-ink text-white">
+    <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-24 lg:grid-cols-[1fr_1.15fr] lg:px-8">
+      <div>
+        <p className="text-sm font-bold text-brand-green">Pour les agences immobilières</p>
+        <h2 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">Gérez les biens de tous vos clients</h2>
+        <p className="mt-5 max-w-xl text-lg leading-8 text-slate-300">Chaque propriétaire qui vous confie ses biens a son espace, ses locataires et ses rapports. Votre équipe encaisse, relance et reverse depuis un seul tableau de bord.</p>
+        <ul className="mt-7 space-y-3.5">{agencyPoints.map(x=><li key={x} className="flex gap-3 text-slate-200"><Check/>{x}</li>)}</ul>
+        <div className="mt-8 flex flex-wrap gap-3"><Link href="/signup" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 font-semibold text-brand-ink hover:bg-brand-mist">Créer l’espace de mon agence<ArrowRight className="h-4 w-4"/></Link><a href="#pricing" className="inline-flex items-center rounded-xl border border-white/20 px-6 py-3.5 font-semibold text-white hover:bg-white/10">Voir l’offre Business</a></div>
+      </div>
+      <div className="relative aspect-[1.25/1] w-full overflow-hidden rounded-[32px] bg-gradient-to-b from-[#1B2A63] to-[#0B1A4A]">
+        <AgencyDistrict3DLazy className="h-full w-full"/>
+      </div>
+    </div>
+  </section>
+
+  {/* Tenants */}
+  <section id="locataires" className="relative overflow-hidden bg-gradient-to-b from-[#F2F6FF] to-white">
+    <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-24 lg:grid-cols-2 lg:px-8">
+      <div>
+        <p className="text-sm font-bold text-brand-blue">Pour les locataires</p>
+        <h2 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">Payez facilement et gardez vos quittances</h2>
+        <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">Votre espace locataire vous suit d’un logement à l’autre. Vos quittances restent accessibles à tout moment, et votre historique de paiement devient une référence auprès de vos futurs propriétaires.</p>
+        <ul className="mt-7 space-y-3.5">{tenants.map(x=><li key={x} className="flex gap-3 text-slate-700"><Check/>{x}</li>)}</ul>
+        <div className="mt-8 grid max-w-xl gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl border border-brand-line bg-white p-4"><Tile icon={History}/><b className="mt-3 block">Historique portable</b><p className="mt-1 text-sm text-slate-500">Vos paiements passés vous suivent quand vous déménagez.</p></div>
+          <div className="rounded-2xl border border-brand-line bg-white p-4"><Tile icon={ShieldCheck}/><b className="mt-3 block">Partagé avec votre accord</b><p className="mt-1 text-sm text-slate-500">Un propriétaire ne voit votre historique que si vous l’autorisez.</p></div>
+        </div>
+        <Link href="/espace-locataire" className="mt-8 inline-flex items-center gap-2 rounded-xl bg-brand-ink px-6 py-3.5 font-semibold text-white hover:bg-black">Accéder à l’espace locataire<ArrowRight className="h-4 w-4"/></Link>
+      </div>
+      <div className="relative mx-auto h-[540px] w-full max-w-[540px]">
+        <div aria-hidden className="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-brand-blue/15 to-brand-green/20"/>
+        <TenantPhones3DLazy className="h-full w-full"/>
+        <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-2xl border border-brand-line bg-white p-3 pr-5 shadow-2xl shadow-blue-100"><QrMark size={44} className="text-brand-ink"/><span><b className="block text-sm">Quittance vérifiable</b><span className="text-xs text-slate-500">avec code QR</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  {/* How it works */}
+  <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8">
+    <div className="text-center"><h2 className="text-4xl font-extrabold tracking-tight">Comment ça marche ?</h2><p className="mt-3 text-slate-500">Une mise en place simple et rapide.</p></div>
+    <ol className="relative mt-14 grid gap-10 md:grid-cols-4">
+      <span aria-hidden className="absolute left-[12%] right-[12%] top-7 hidden border-t-2 border-dashed border-brand-line md:block"/>
+      {steps.map(([I,t,d],i)=><li key={t} className="relative text-center">
+        <span className="relative mx-auto block w-fit rounded-2xl bg-white px-3"><Tile icon={I} size="lg"/></span>
+        <h3 className="mt-5 font-bold"><span className="text-brand-blue">{i+1}.</span> {t}</h3><p className="mx-auto mt-1.5 max-w-[14rem] text-sm leading-6 text-slate-500">{d}</p>
+      </li>)}
+    </ol>
+  </section>
+
+  {/* Pricing */}
+  <section id="pricing" className="bg-gradient-to-b from-[#EEFBF5] to-[#F2F6FF]">
+    <div className="mx-auto max-w-7xl px-5 py-24 lg:px-8">
+      <h2 className="text-4xl font-extrabold tracking-tight">Des offres adaptées à vos besoins</h2>
+      <p className="mt-3 text-slate-500">Commencez gratuitement et passez à une offre supérieure quand vous le souhaitez.</p>
+      <div className="mt-12 grid gap-5 md:grid-cols-3">{plans.map(p=><article key={p.name} className={`relative flex flex-col rounded-3xl bg-white p-7 ${p.popular?"shadow-2xl shadow-blue-200 ring-2 ring-brand-blue md:-translate-y-3":"border border-brand-line"}`}>
+        {p.popular&&<span className="absolute -top-3 right-6 rounded-full bg-brand-blue px-3 py-1 text-xs font-bold text-white">Le plus populaire</span>}
+        <div className="flex items-center gap-3"><Tile icon={p.icon}/><div><h3 className="font-bold">{p.name}</h3><p className="text-xs text-slate-500">{p.tag}</p></div></div>
+        <strong className="mt-6 block text-3xl font-extrabold">{p.price}</strong>
+        <ul className="mt-6 flex-1 space-y-2.5 text-sm text-slate-600">{p.items.map(x=><li key={x} className="flex gap-2"><CircleCheck className="h-4 w-4 shrink-0 text-brand-green"/>{x}</li>)}</ul>
+        <Link href="/signup" className={`mt-8 block rounded-xl p-3 text-center text-sm font-semibold ${p.popular?"bg-brand-blue text-white hover:bg-brand-deep":"border border-brand-blue text-brand-blue hover:bg-brand-mist"}`}>{p.cta}</Link>
+      </article>)}</div>
+    </div>
+  </section>
+
+  {/* FAQ */}
+  <section id="faq" className="mx-auto grid max-w-7xl gap-10 px-5 py-24 lg:grid-cols-[1fr_1.4fr] lg:px-8">
+    <div><h2 className="text-4xl font-extrabold tracking-tight">Questions fréquentes</h2><p className="mt-3 text-slate-500">Les réponses aux questions les plus courantes.</p><div className="mt-8 hidden items-center gap-3 rounded-2xl bg-brand-mist p-4 lg:flex"><Tile icon={UserRoundSearch}/><p className="text-sm text-slate-600">Locataire déjà inscrit ? Vos quittances vous attendent dans votre <Link href="/espace-locataire" className="font-semibold text-brand-blue">espace locataire</Link>.</p></div></div>
+    <div className="space-y-3">{faq.map(([q,a])=><details key={q} className="group rounded-2xl border border-brand-line bg-white p-5 open:shadow-lg open:shadow-blue-50"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">{q}<ChevronDown className="h-5 w-5 shrink-0 text-slate-400 transition-transform group-open:rotate-180"/></summary><p className="mt-3 text-sm leading-6 text-slate-500">{a}</p></details>)}</div>
+  </section>
+
+  <SiteFooter/>
+</main>}
