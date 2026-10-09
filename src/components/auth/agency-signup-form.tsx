@@ -1,7 +1,9 @@
 "use client";
 import {useEffect, useState, type FormEvent} from "react";
 import {useRouter} from "next/navigation";
+import Link from "next/link";
 import {authClient} from "@/lib/auth/client";
+import {rememberSignupFlash} from "@/lib/feedback/signup-flash";
 
 export function AgencySignupForm() {
   const router = useRouter();
@@ -31,6 +33,7 @@ export function AgencySignupForm() {
         if (result.error) {setError(result.error.message ?? "Impossible de créer le compte."); return;}
         setAccountCreated(true);
         sessionStorage.setItem("pendingAgencySignup",JSON.stringify({email,agencyName}));
+        rememberSignupFlash({kind:"agency",email,step:"created"});
       }
       let response: Response | undefined;
       for (let attempt=0; attempt<3; attempt++) {
@@ -40,8 +43,8 @@ export function AgencySignupForm() {
         await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));
       }
       if (!response) throw new Error("AGENCY_UNAVAILABLE");
-      if (response.status === 401) {setNotice("Compte créé. Vérifiez votre email, puis reconnectez-vous pour ouvrir votre agence."); return;}
-      if (!response.ok) {setError(response.status===403?"Ce compte possède déjà un autre espace ImmoPay.":"Compte créé, mais l’agence n’a pas pu être configurée. Réessayez sans recréer le compte."); return;}
+      if (response.status === 401) {rememberSignupFlash({kind:"agency",email,step:"verify_email"});setNotice(`Compte créé pour ${email}. Vérifiez votre email si nécessaire, puis connectez-vous pour ouvrir votre agence.`); return;}
+      if (!response.ok) {rememberSignupFlash({kind:"agency",email,step:"finish_setup"});setError(response.status===403?"Ce compte possède déjà un autre espace ImmoPay.":`Le compte ${email} existe, mais l’agence n’a pas pu être configurée. Connectez-vous pour reprendre.`); return;}
       sessionStorage.removeItem("pendingAgencySignup");
       router.replace("/dashboard"); router.refresh();
     } catch {setError("La création du compte a échoué. Réessayez.");}
@@ -54,6 +57,7 @@ export function AgencySignupForm() {
     <label className="text-sm font-medium">Mot de passe<input name="password" type="password" minLength={8} required autoComplete="new-password" className="mt-2 w-full rounded-xl border p-3.5"/></label></>}
     {error && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
     {notice && <p role="status" className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">{notice}</p>}
+    {(notice || accountCreated && error) && <Link href="/login" className="text-sm font-semibold text-brand-blue">Se connecter</Link>}
     <button disabled={pending} className="rounded-xl bg-indigo-600 p-3.5 font-semibold text-white disabled:opacity-60">{pending?"Création…":accountCreated?"Terminer la création":"Créer mon agence"}</button>
   </form>;
 }

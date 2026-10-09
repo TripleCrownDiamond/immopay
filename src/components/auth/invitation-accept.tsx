@@ -2,8 +2,9 @@
 import {useEffect, useState, type FormEvent} from "react";
 import {useRouter} from "next/navigation";
 import {authClient} from "@/lib/auth/client";
+import {rememberSignupFlash} from "@/lib/feedback/signup-flash";
 
-export function InvitationAccept({token}:{token:string}) {
+export function InvitationAccept({token,kind}:{token:string;kind:"tenant"|"agency_manager"}) {
   const router=useRouter();
   const [accountEmail,setAccountEmail]=useState("");
   const [mode,setMode]=useState<"signup"|"signin">("signup");
@@ -12,15 +13,16 @@ export function InvitationAccept({token}:{token:string}) {
   const [notice,setNotice]=useState("");
   useEffect(()=>{void authClient.getSession().then(result=>setAccountEmail(result.data?.user?.email??""));},[]);
 
-  async function activate() {
+  async function activate(email=accountEmail,created=false) {
     const response=await fetch("/api/invitations/accept",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token})});
-    if (response.status===401) {setNotice("Compte créé. Vérifiez votre email, puis revenez sur ce lien et connectez-vous.");return;}
+    if (response.status===401) {if (created) rememberSignupFlash({kind,email,step:"verify_email"});setMode("signin");setNotice(created?`Compte créé pour ${email}. Vérifiez votre email si nécessaire, puis connectez-vous ici pour accepter l’invitation.`:"Reconnectez-vous pour accepter cette invitation.");return;}
     if (!response.ok) {
       const body=await response.json().catch(()=>({})) as {error?:string};
       setError(body.error==="EMAIL_MISMATCH"?"Connectez-vous avec l’adresse indiquée dans l’invitation.":body.error==="ROLE_CONFLICT"?"Ce compte possède déjà un autre type d’espace ImmoPay.":"Ce lien ne peut plus être activé. Demandez-en un nouveau.");
       return;
     }
     const {destination}=await response.json() as {destination:string};
+    if (created) rememberSignupFlash({kind,email,step:"created"});
     router.replace(destination); router.refresh();
   }
 
@@ -34,7 +36,8 @@ export function InvitationAccept({token}:{token:string}) {
       const result=mode==="signup"?await authClient.signUp.email({email,password,name}):await authClient.signIn.email({email,password});
       if (result.error) {setError(result.error.message??"La connexion a échoué.");return;}
       setAccountEmail(email);
-      await activate();
+      if (mode==="signup") rememberSignupFlash({kind,email,step:"created"});
+      await activate(email,mode==="signup");
     } catch {setError("Impossible d’activer l’invitation. Réessayez.");}
     finally {setPending(false);}
   }

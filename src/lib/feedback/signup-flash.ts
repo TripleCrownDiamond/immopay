@@ -32,3 +32,19 @@ export function takeSignupFlash(): SignupFlash | null {
     return null;
   }
 }
+
+declare global {
+  interface Window {__immopayLoginFlash?: SignupFlash | null;}
+}
+
+export function takeSignupFlashForLogin(): SignupFlash | null {
+  if (typeof window === "undefined") return null;
+  if (window.__immopayLoginFlash) return window.__immopayLoginFlash;
+  const flash = takeSignupFlash();
+  if (flash) window.__immopayLoginFlash = flash;
+  return flash;
+}
+
+export function clearLoginFlashCache(): void {
+  if (typeof window !== "undefined") window.__immopayLoginFlash = null;
+}

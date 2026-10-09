@@ -3,6 +3,7 @@ import {useState, type FormEvent} from "react";
 import Link from "next/link";
 import {authClient} from "@/lib/auth/client";
 import {requestResetPublicMessage} from "@/lib/auth/password-recovery";
+import toast from "react-hot-toast";
 
 export function PasswordResetRequest() {
   const [pending,setPending]=useState(false);
@@ -13,6 +14,7 @@ export function PasswordResetRequest() {
     try {
       const form=new FormData(event.currentTarget);
       setNotice(await requestResetPublicMessage(String(form.get("email")??""),window.location.origin));
+      toast.success("Demande enregistrée. Vérifiez votre boîte mail.");
     } catch {setError("La demande est temporairement indisponible. Réessayez plus tard.");}
     finally {setPending(false);}
   }

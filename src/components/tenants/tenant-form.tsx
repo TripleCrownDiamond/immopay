@@ -14,6 +14,7 @@ export function TenantForm() {
         fullName:String(form.get("fullName")??""), email:String(form.get("email")??""), phone:String(form.get("phone")??""),
       })});
       if (!response.ok) {setError(response.status===403?"Accès refusé.":"Vérifiez le nom et l’adresse email du locataire."); return;}
+      try {sessionStorage.setItem("immopay.tenant-created.v1","1");} catch { /* Storage may be disabled. */ }
       router.replace("/tenants"); router.refresh();
     } catch {setError("Impossible d’ajouter ce locataire. Réessayez.");}
     finally {setPending(false);}

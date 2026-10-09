@@ -5,17 +5,18 @@ import {getPool, type Queryable} from "../db/pool";
 import {requireAgencyManager} from "./agency";
 import {isUuid, OnboardingError} from "./errors";
 import {normalizeEmail} from "./tenants";
+import type {InvitationDelivery} from "../email/invitation-email";
 
 export type InvitationKind = "tenant" | "agency_manager";
 export type InvitationInput = {kind: InvitationKind; organizationId: string; tenantId?: string; email?: string};
 
-export async function issueInvitation(userId: string, input: InvitationInput, db: Pool = getPool()): Promise<{id: string; urlToken: string}> {
+export async function issueInvitation(userId: string, input: InvitationInput, db: Pool = getPool()): Promise<{id: string; urlToken: string; email:string; organizationName:string}> {
   if (!isUuid(input.organizationId) || (input.tenantId && !isUuid(input.tenantId))) throw new OnboardingError("INVALID_ID");
   if (input.kind !== "tenant" && input.kind !== "agency_manager") throw new OnboardingError("INVALID_INVITATION");
   const client = await db.connect();
   try {
     await client.query("BEGIN");
-    await requireOrganization(userId, input.organizationId, client);
+    const organization=await requireOrganization(userId, input.organizationId, client);
     let email: string;
     let tenantId: string | null = null;
     if (input.kind === "agency_manager") {
@@ -42,20 +43,26 @@ export async function issueInvitation(userId: string, input: InvitationInput, db
       VALUES($1,$2,$3,$4,$5,now()+interval '7 days',$6) RETURNING id`,
       [input.organizationId, input.kind, tenantId, email, tokenHash, userId]);
     await client.query("COMMIT");
-    return {id: inserted.rows[0].id as string, urlToken};
+    return {id: inserted.rows[0].id as string, urlToken, email, organizationName:organization.organizationName};
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
   } finally {client.release();}
 }
 
-export type InvitationListItem = {id: string; kind: InvitationKind; email: string; tenantId: string | null; expiresAt: string; acceptedAt: string | null; revokedAt: string | null};
+export async function markInvitationDelivery(id:string,status:InvitationDelivery,db:Queryable=getPool()):Promise<void> {
+  await db.query(`UPDATE account_invitations SET email_delivery_status=$2,
+    email_accepted_at=CASE WHEN $2='sent' THEN now() ELSE NULL END WHERE id=$1`,[id,status]);
+}
+
+export type InvitationListItem = {id: string; kind: InvitationKind; email: string; tenantId: string | null; expiresAt: string; acceptedAt: string | null; revokedAt: string | null; emailDeliveryStatus:InvitationDelivery;emailAcceptedAt:string|null};
 
 export async function listInvitations(userId: string, organizationId: string, db: Queryable = getPool()): Promise<InvitationListItem[]> {
   if (!isUuid(organizationId)) throw new OnboardingError("INVALID_ID");
   await requireOrganization(userId, organizationId, db);
   const result = await db.query(`SELECT id,kind,email,tenant_id AS "tenantId",
-    expires_at AS "expiresAt",accepted_at AS "acceptedAt",revoked_at AS "revokedAt"
+    expires_at AS "expiresAt",accepted_at AS "acceptedAt",revoked_at AS "revokedAt",
+    email_delivery_status AS "emailDeliveryStatus",email_accepted_at AS "emailAcceptedAt"
     FROM account_invitations WHERE organization_id=$1 ORDER BY created_at DESC,id DESC LIMIT 100`, [organizationId]);
   return result.rows;
 }
